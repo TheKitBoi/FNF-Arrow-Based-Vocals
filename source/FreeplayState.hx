@@ -30,6 +30,7 @@ class FreeplayState extends MusicBeatState
 
 	override function create()
 	{
+		FlxG.log.add('Thing 1');
 		songs = CoolUtil.coolTextFile('assets/data/freeplaySonglist.txt');
 
 		/* 
@@ -45,7 +46,7 @@ class FreeplayState extends MusicBeatState
 		#if debug
 		isDebug = true;
 		#end
-
+		FlxG.log.add('Thing 2');
 		if (StoryMenuState.weekUnlocked[2] || isDebug)
 		{
 			songs.push('Spookeez');
@@ -84,7 +85,7 @@ class FreeplayState extends MusicBeatState
 		// LOAD MUSIC
 
 		// LOAD CHARACTERS
-
+		FlxG.log.add('Thing 3');
 		var bg:FlxSprite = new FlxSprite().loadGraphic('assets/images/menuBGBlue.png');
 		add(bg);
 
@@ -152,6 +153,7 @@ class FreeplayState extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
+		FlxG.log.add('Ding 1');
 		super.update(elapsed);
 
 		if (FlxG.sound.music.volume < 0.7)
@@ -230,9 +232,9 @@ class FreeplayState extends MusicBeatState
 
 	function changeSelection(change:Int = 0)
 	{
-		#if !switch
-		NGio.logEvent('Fresh');
-		#end
+		// #if !switch
+		// NGio.logEvent('Fresh');
+		// #end
 
 		// NGio.logEvent('Fresh');
 		FlxG.sound.play('assets/sounds/scrollMenu' + TitleState.soundExt, 0.4);

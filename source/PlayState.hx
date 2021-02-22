@@ -53,6 +53,11 @@ class PlayState extends MusicBeatState
 	var halloweenLevel:Bool = false;
 
 	private var vocals:FlxSound;
+	var playertapu:FlxSound;
+	var playertapd:FlxSound;
+	var playertapl:FlxSound;
+	var playertapr:FlxSound;
+	var playertapm:FlxSound;
 
 	private var dad:Character;
 	private var gf:Character;
@@ -142,6 +147,26 @@ class PlayState extends MusicBeatState
 
 		Conductor.mapBPMChanges(SONG);
 		Conductor.changeBPM(SONG.bpm);
+
+		playertapu = new FlxSound().loadEmbedded('assets/sounds/playertapu' + TitleState.soundExt);
+		FlxG.sound.list.add(playertapu);
+		//playertapu.volume = 0.5;
+
+		playertapd = new FlxSound().loadEmbedded('assets/sounds/playertapd' + TitleState.soundExt);
+		FlxG.sound.list.add(playertapd);
+		//playertapd.volume = 0.5;
+
+		playertapl = new FlxSound().loadEmbedded('assets/sounds/playertapl' + TitleState.soundExt);
+		FlxG.sound.list.add(playertapl);
+		//playertapl.volume = 0.6;
+
+		playertapr = new FlxSound().loadEmbedded('assets/sounds/playertapr' + TitleState.soundExt);
+		FlxG.sound.list.add(playertapr);
+		//playertapr.volume = 0.6;
+
+		playertapm = new FlxSound().loadEmbedded('assets/sounds/playertapm' + TitleState.soundExt);
+		FlxG.sound.list.add(playertapm);
+		playertapm.volume = 0.6;
 
 		switch (SONG.song.toLowerCase())
 		{
@@ -2034,6 +2059,7 @@ class PlayState extends MusicBeatState
 			FlxG.sound.play('assets/sounds/missnote' + FlxG.random.int(1, 3) + TitleState.soundExt, FlxG.random.float(0.1, 0.2));
 			// FlxG.sound.play('assets/sounds/missnote1' + TitleState.soundExt, 1, false);
 			// FlxG.log.add('played imss note');
+			playertapm.play(true);
 
 			boyfriend.stunned = true;
 
@@ -2094,6 +2120,19 @@ class PlayState extends MusicBeatState
 			{
 				popUpScore(note.strumTime);
 				combo += 1;
+			}
+			if (!note.isSustainNote || boyfriend.holdTimer == 0){
+				switch (note.noteData)
+				{
+					case 0:
+						playertapl.play(true);
+					case 1:
+						playertapd.play(true);
+					case 2:
+						playertapu.play(true);
+					case 3:
+						playertapr.play(true);
+				}
 			}
 
 			if (note.noteData >= 0)
