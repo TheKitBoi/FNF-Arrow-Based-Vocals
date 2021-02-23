@@ -83,6 +83,16 @@ class ChartingState extends MusicBeatState
 	var leftIcon:HealthIcon;
 	var rightIcon:HealthIcon;
 
+	var playertapu:FlxSound;
+	var playertapd:FlxSound;
+	var playertapl:FlxSound;
+	var playertapr:FlxSound;
+
+	var dadtapu:FlxSound;
+	var dadtapd:FlxSound;
+	var dadtapl:FlxSound;
+	var dadtapr:FlxSound;
+
 	override function create()
 	{
 		curSection = lastSection;
@@ -103,6 +113,30 @@ class ChartingState extends MusicBeatState
 
 		leftIcon.setPosition(0, -100);
 		rightIcon.setPosition(gridBG.width / 2, -100);
+
+		playertapu = new FlxSound().loadEmbedded('assets/sounds/playertapu' + TitleState.soundExt);
+		FlxG.sound.list.add(playertapu);
+
+		playertapd = new FlxSound().loadEmbedded('assets/sounds/playertapd' + TitleState.soundExt);
+		FlxG.sound.list.add(playertapd);
+
+		playertapl = new FlxSound().loadEmbedded('assets/sounds/playertapl' + TitleState.soundExt);
+		FlxG.sound.list.add(playertapl);
+
+		playertapr = new FlxSound().loadEmbedded('assets/sounds/playertapr' + TitleState.soundExt);
+		FlxG.sound.list.add(playertapr);
+
+		dadtapu = new FlxSound().loadEmbedded('assets/sounds/playertapu' + TitleState.soundExt);
+		FlxG.sound.list.add(playertapu);
+
+		dadtapd = new FlxSound().loadEmbedded('assets/sounds/playertapd' + TitleState.soundExt);
+		FlxG.sound.list.add(playertapd);
+
+		dadtapl = new FlxSound().loadEmbedded('assets/sounds/playertapl' + TitleState.soundExt);
+		FlxG.sound.list.add(playertapl);
+
+		dadtapr = new FlxSound().loadEmbedded('assets/sounds/playertapr' + TitleState.soundExt);
+		FlxG.sound.list.add(playertapr);
 
 		var gridBlackLine:FlxSprite = new FlxSprite(gridBG.x + gridBG.width / 2).makeGraphic(2, Std.int(gridBG.height), FlxColor.BLACK);
 		add(gridBlackLine);
@@ -200,6 +234,36 @@ class ChartingState extends MusicBeatState
 			FlxG.sound.music.volume = vol;
 		};
 
+		var check_dad_drum = new FlxUICheckBox(10, 225, null, null, "Dad Drums", 100);
+		check_dad_drum.checked = true;
+		check_dad_drum.callback = function()
+		{
+			var vol:Float = 0.0;
+
+			if (check_dad_drum.checked)
+				vol = 1.0;
+
+			dadtapd.volume = vol;
+			dadtapu.volume = vol;
+			dadtapl.volume = vol;
+			dadtapr.volume = vol;
+		};
+
+		var check_bf_drum = new FlxUICheckBox(10, 250, null, null, "BF Drums", 100);
+		check_bf_drum.checked = true;
+		check_bf_drum.callback = function()
+		{
+			var vol:Float = 0.0;
+
+			if (check_bf_drum.checked)
+				vol = 1.0;
+
+			playertapd.volume = vol;
+			playertapu.volume = vol;
+			playertapr.volume = vol;
+			playertapl.volume = vol;
+		};
+
 		var saveButton:FlxButton = new FlxButton(110, 8, "Save", function()
 		{
 			saveLevel();
@@ -246,6 +310,8 @@ class ChartingState extends MusicBeatState
 
 		tab_group_song.add(check_voices);
 		tab_group_song.add(check_mute_inst);
+		tab_group_song.add(check_dad_drum);
+		tab_group_song.add(check_bf_drum);
 		tab_group_song.add(saveButton);
 		tab_group_song.add(reloadSong);
 		tab_group_song.add(reloadSongJson);
@@ -583,6 +649,10 @@ class ChartingState extends MusicBeatState
 				{
 					FlxG.sound.music.pause();
 					vocals.pause();
+					for (note in curRenderedNotes)
+					{
+						note.tooLate = false;
+					}
 				}
 				else
 				{
@@ -668,6 +738,44 @@ class ChartingState extends MusicBeatState
 			+ Std.string(FlxMath.roundDecimal(FlxG.sound.music.length / 1000, 2))
 			+ "\nSection: "
 			+ curSection;
+		
+		if (FlxG.sound.music.playing)
+		{
+			for (note in curRenderedNotes)
+			{
+				if (note.strumTime - Conductor.songPosition <= 0 && note.strumTime - Conductor.songPosition > -60 && !note.tooLate)
+				{
+					if ((!_song.notes[curSection].mustHitSection && note.x <= GRID_SIZE * 3) || (_song.notes[curSection].mustHitSection && note.x > GRID_SIZE * 3)){
+						switch (note.noteData)
+						{
+							case 0:
+								dadtapl.play(true);
+							case 1:
+								dadtapd.play(true);
+							case 2:
+								dadtapu.play(true);
+							case 3:
+								dadtapr.play(true);
+						}
+					}
+					else if ((_song.notes[curSection].mustHitSection && note.x <= GRID_SIZE * 3) || (!_song.notes[curSection].mustHitSection && note.x > GRID_SIZE * 3)){
+						switch (note.noteData)
+						{
+							case 0:
+								playertapl.play(true);
+							case 1:
+								playertapd.play(true);
+							case 2:
+								playertapu.play(true);
+							case 3:
+								playertapr.play(true);
+						}
+					}
+					
+					note.tooLate = true;
+				}
+			}
+		}
 		super.update(elapsed);
 	}
 
@@ -758,6 +866,7 @@ class ChartingState extends MusicBeatState
 
 			updateGrid();
 			updateSectionUI();
+
 		}
 	}
 
