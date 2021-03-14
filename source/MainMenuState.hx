@@ -13,6 +13,8 @@ import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import io.newgrounds.NG;
 import lime.app.Application;
+import flixel.addons.ui.FlxUICheckBox;
+import flixel.addons.ui.FlxUIAssets;
 
 using StringTools;
 
@@ -30,6 +32,9 @@ class MainMenuState extends MusicBeatState
 
 	var magenta:FlxSprite;
 	var camFollow:FlxObject;
+
+	var checkAuditory:FlxText;
+	var checkRequireGood:FlxText;
 
 	override function create()
 	{
@@ -97,6 +102,17 @@ class MainMenuState extends MusicBeatState
 
 		changeItem();
 
+		//checkAuditory = new FlxUICheckBox(FlxG.width - 300, FlxG.height - 150, FlxUIAssets.IMG_CHECK_BOX, FlxUIAssets.IMG_CHECK_MARK, "Auditory Feedback (Left Arrow Button)");
+		checkAuditory = new FlxText(5, FlxG.height - 150, 0, "Auditory Feedback (Press O to toggle): " + TitleState.auditoryFeedback, 12);
+		checkAuditory.scrollFactor.set();
+		checkAuditory.setFormat("VCR OSD Mono", 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		add(checkAuditory);
+
+		checkRequireGood = new FlxText(5, FlxG.height - 100, 0, "Require Good Rank at Song End (Press P to toggle): " + TitleState.requireGood, 12);
+		checkRequireGood.scrollFactor.set();
+		checkRequireGood.setFormat("VCR OSD Mono", 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		add(checkRequireGood);
+
 		super.create();
 	}
 
@@ -111,6 +127,30 @@ class MainMenuState extends MusicBeatState
 
 		if (!selectedSomethin)
 		{
+			if (FlxG.keys.justPressed.O)
+			{
+				FlxG.sound.play('assets/sounds/scrollMenu' + TitleState.soundExt);
+				if (TitleState.auditoryFeedback)
+					TitleState.auditoryFeedback = false;
+				else
+					TitleState.auditoryFeedback = true;
+				checkAuditory.text = "Auditory Feedback (Press O to toggle): " + TitleState.auditoryFeedback;
+				FlxG.save.data.auditoryFeedback = TitleState.auditoryFeedback;
+				FlxG.save.flush();
+			}
+
+			if (FlxG.keys.justPressed.P)
+			{
+				FlxG.sound.play('assets/sounds/scrollMenu' + TitleState.soundExt);
+				if (TitleState.requireGood)
+					TitleState.requireGood = false;
+				else
+					TitleState.requireGood = true;
+				checkRequireGood.text = "Require Good Rank at Song End (Press P to toggle): " + TitleState.requireGood;
+				FlxG.save.data.requireGood = TitleState.requireGood;
+				FlxG.save.flush();
+			}
+
 			if (controls.UP_P)
 			{
 				FlxG.sound.play('assets/sounds/scrollMenu' + TitleState.soundExt);

@@ -42,8 +42,12 @@ class TitleState extends MusicBeatState
 
 	var wackyImage:FlxSprite;
 
+	static public var auditoryFeedback:Bool = false;
+	static public var requireGood:Bool = true;
+
 	override public function create():Void
 	{
+
 		Polymod.init({modRoot: "mods", dirs: ['introMod']});
 
 		#if (!web)
@@ -58,7 +62,7 @@ class TitleState extends MusicBeatState
 
 		super.create();
 
-		NGio.noLogin(APIStuff.API);
+		//NGio.noLogin(APIStuff.API);
 
 		#if ng
 		var ng:NGio = new NGio(APIStuff.API, APIStuff.EncKey);
@@ -93,6 +97,11 @@ class TitleState extends MusicBeatState
 			startIntro();
 		});
 		#end
+
+		if (FlxG.save.data.auditoryFeedback != null)
+			auditoryFeedback = FlxG.save.data.auditoryFeedback;
+		if (FlxG.save.data.requireGood != null)
+			requireGood = FlxG.save.data.requireGood;
 	}
 
 	var logoBl:FlxSprite;
