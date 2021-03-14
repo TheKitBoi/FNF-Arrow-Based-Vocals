@@ -227,17 +227,17 @@ class PlayState extends MusicBeatState
 		FlxG.sound.list.add(playertapm);
 		playertapm.volume = 0.6;
 
-		gradeup = new FlxSound().loadEmbedded('assets/sounds/gradeup' + TitleState.soundExt);
-		FlxG.sound.list.add(gradeup);
+		gradeup = FlxG.sound.load('assets/sounds/gradeup' + TitleState.soundExt);
+		//FlxG.sound.list.add(gradeup);
 
-		gradedown = new FlxSound().loadEmbedded('assets/sounds/gradedown' + TitleState.soundExt);
-		FlxG.sound.list.add(gradedown);
+		gradedown = FlxG.sound.load('assets/sounds/gradedown' + TitleState.soundExt);
+		//FlxG.sound.list.add(gradedown);
 
-		phrasegood = new FlxSound().loadEmbedded('assets/sounds/phrasegood' + TitleState.soundExt);
-		FlxG.sound.list.add(gradeup);
+		phrasegood = FlxG.sound.load('assets/sounds/phrasegood' + TitleState.soundExt);
+		//FlxG.sound.list.add(gradeup);
 
-		phrasebad = new FlxSound().loadEmbedded('assets/sounds/phrasebad' + TitleState.soundExt);
-		FlxG.sound.list.add(gradedown);
+		phrasebad = FlxG.sound.load('assets/sounds/phrasebad' + TitleState.soundExt);
+		//FlxG.sound.list.add(gradedown);
 
 		if (FileSystem.exists("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt)){
 			FlxG.sound.cache("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt);
@@ -1818,30 +1818,30 @@ class PlayState extends MusicBeatState
 			{
 				case 1:
 					if (playerGrade > 0){
-						gradeup.play(true);
+						gradeup.play();
 						goGood();
 					}
 				case 3:
 					if (playerGrade > 1){
-						gradeup.play(true);
+						gradeup.play();
 						goBad();
 					}
 			}
 			if (gradeLevel > 0)
 				gradeLevel--;
-			phrasegood.play(true);
+			phrasegood.play();
 		}
 		else if (prevGradeHealth < 0){
 			switch (gradeLevel)
 			{
 				case 1:
 					if (playerGrade == 0){
-						gradedown.play(true);
+						gradedown.play();
 						goBad();
 					}
 				case 3:
 					if (playerGrade < 2){
-						gradedown.play(true);
+						gradedown.play();
 						goAwful();
 					}
 				case 5:
@@ -1849,7 +1849,7 @@ class PlayState extends MusicBeatState
 			}
 			if (gradeLevel < 6)
 				gradeLevel++;
-			phrasebad.play(true);
+			phrasebad.play();
 		}
 		if (!doFlicker && gradeLevel % 2 == 1)
 			startFlicker();
