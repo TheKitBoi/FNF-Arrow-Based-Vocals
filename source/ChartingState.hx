@@ -83,15 +83,18 @@ class ChartingState extends MusicBeatState
 	var leftIcon:HealthIcon;
 	var rightIcon:HealthIcon;
 
-	var playertapu:FlxSound;
-	var playertapd:FlxSound;
-	var playertapl:FlxSound;
-	var playertapr:FlxSound;
+	// var playertapu:FlxSound;
+	// var playertapd:FlxSound;
+	// var playertapl:FlxSound;
+	// var playertapr:FlxSound;
 
-	var dadtapu:FlxSound;
-	var dadtapd:FlxSound;
-	var dadtapl:FlxSound;
-	var dadtapr:FlxSound;
+	// var dadtapu:FlxSound;
+	// var dadtapd:FlxSound;
+	// var dadtapl:FlxSound;
+	// var dadtapr:FlxSound;
+
+	var bfDrumPlay = true;
+	var dadDrumPlay = true;
 
 	override function create()
 	{
@@ -114,29 +117,34 @@ class ChartingState extends MusicBeatState
 		leftIcon.setPosition(0, -100);
 		rightIcon.setPosition(gridBG.width / 2, -100);
 
-		playertapu = new FlxSound().loadEmbedded('assets/sounds/playertapu' + TitleState.soundExt);
-		FlxG.sound.list.add(playertapu);
+		// playertapu = new FlxSound().loadEmbedded('assets/sounds/playertapu' + TitleState.soundExt);
+		// FlxG.sound.list.add(playertapu);
 
-		playertapd = new FlxSound().loadEmbedded('assets/sounds/playertapd' + TitleState.soundExt);
-		FlxG.sound.list.add(playertapd);
+		// playertapd = new FlxSound().loadEmbedded('assets/sounds/playertapd' + TitleState.soundExt);
+		// FlxG.sound.list.add(playertapd);
 
-		playertapl = new FlxSound().loadEmbedded('assets/sounds/playertapl' + TitleState.soundExt);
-		FlxG.sound.list.add(playertapl);
+		// playertapl = new FlxSound().loadEmbedded('assets/sounds/playertapl' + TitleState.soundExt);
+		// FlxG.sound.list.add(playertapl);
 
-		playertapr = new FlxSound().loadEmbedded('assets/sounds/playertapr' + TitleState.soundExt);
-		FlxG.sound.list.add(playertapr);
+		// playertapr = new FlxSound().loadEmbedded('assets/sounds/playertapr' + TitleState.soundExt);
+		// FlxG.sound.list.add(playertapr);
 
-		dadtapu = new FlxSound().loadEmbedded('assets/sounds/playertapu' + TitleState.soundExt);
-		FlxG.sound.list.add(playertapu);
+		// dadtapu = new FlxSound().loadEmbedded('assets/sounds/playertapu' + TitleState.soundExt);
+		// FlxG.sound.list.add(playertapu);
 
-		dadtapd = new FlxSound().loadEmbedded('assets/sounds/playertapd' + TitleState.soundExt);
-		FlxG.sound.list.add(playertapd);
+		// dadtapd = new FlxSound().loadEmbedded('assets/sounds/playertapd' + TitleState.soundExt);
+		// FlxG.sound.list.add(playertapd);
 
-		dadtapl = new FlxSound().loadEmbedded('assets/sounds/playertapl' + TitleState.soundExt);
-		FlxG.sound.list.add(playertapl);
+		// dadtapl = new FlxSound().loadEmbedded('assets/sounds/playertapl' + TitleState.soundExt);
+		// FlxG.sound.list.add(playertapl);
 
-		dadtapr = new FlxSound().loadEmbedded('assets/sounds/playertapr' + TitleState.soundExt);
-		FlxG.sound.list.add(playertapr);
+		// dadtapr = new FlxSound().loadEmbedded('assets/sounds/playertapr' + TitleState.soundExt);
+		// FlxG.sound.list.add(playertapr);
+
+		FlxG.sound.cache('assets/sounds/playertapu' + TitleState.soundExt);
+		FlxG.sound.cache('assets/sounds/playertapd' + TitleState.soundExt);
+		FlxG.sound.cache('assets/sounds/playertapl' + TitleState.soundExt);
+		FlxG.sound.cache('assets/sounds/playertapr' + TitleState.soundExt);
 
 		var gridBlackLine:FlxSprite = new FlxSprite(gridBG.x + gridBG.width / 2).makeGraphic(2, Std.int(gridBG.height), FlxColor.BLACK);
 		add(gridBlackLine);
@@ -238,30 +246,36 @@ class ChartingState extends MusicBeatState
 		check_dad_drum.checked = true;
 		check_dad_drum.callback = function()
 		{
-			var vol:Float = 0.0;
+			//var vol:Float = 0.0;
+			dadDrumPlay = false;
 
-			if (check_dad_drum.checked)
-				vol = 1.0;
+			if (check_dad_drum.checked){
+				// vol = 1.0;
+				dadDrumPlay = true;
+			}
 
-			dadtapd.volume = vol;
-			dadtapu.volume = vol;
-			dadtapl.volume = vol;
-			dadtapr.volume = vol;
+			// dadtapd.volume = vol;
+			// dadtapu.volume = vol;
+			// dadtapl.volume = vol;
+			// dadtapr.volume = vol;
 		};
 
 		var check_bf_drum = new FlxUICheckBox(10, 250, null, null, "BF Drums", 100);
 		check_bf_drum.checked = true;
 		check_bf_drum.callback = function()
 		{
-			var vol:Float = 0.0;
+			// var vol:Float = 0.0;
+			bfDrumPlay = false;
 
-			if (check_bf_drum.checked)
-				vol = 1.0;
+			if (check_bf_drum.checked){
+				// vol = 1.0;
+				bfDrumPlay = true;
+			}
 
-			playertapd.volume = vol;
-			playertapu.volume = vol;
-			playertapr.volume = vol;
-			playertapl.volume = vol;
+			// playertapd.volume = vol;
+			// playertapu.volume = vol;
+			// playertapr.volume = vol;
+			// playertapl.volume = vol;
 		};
 
 		var saveButton:FlxButton = new FlxButton(110, 8, "Save", function()
@@ -745,30 +759,31 @@ class ChartingState extends MusicBeatState
 			{
 				if (note.strumTime - Conductor.songPosition <= 0 && note.strumTime - Conductor.songPosition > -60 && !note.tooLate)
 				{
-					if ((!_song.notes[curSection].mustHitSection && note.x <= GRID_SIZE * 3) || (_song.notes[curSection].mustHitSection && note.x > GRID_SIZE * 3)){
+					//DD: There has to be a better way to detect Dad vs BF notes
+					if (dadDrumPlay && ((!_song.notes[curSection].mustHitSection && note.x <= GRID_SIZE * 3) || (_song.notes[curSection].mustHitSection && note.x > GRID_SIZE * 3))){
 						switch (note.noteData)
 						{
 							case 0:
-								dadtapl.play(true);
+								FlxG.sound.play("assets/sounds/playertapl" + TitleState.soundExt);
 							case 1:
-								dadtapd.play(true);
+								FlxG.sound.play("assets/sounds/playertapd" + TitleState.soundExt);
 							case 2:
-								dadtapu.play(true);
+								FlxG.sound.play("assets/sounds/playertapu" + TitleState.soundExt);
 							case 3:
-								dadtapr.play(true);
+								FlxG.sound.play("assets/sounds/playertapr" + TitleState.soundExt);
 						}
 					}
-					else if ((_song.notes[curSection].mustHitSection && note.x <= GRID_SIZE * 3) || (!_song.notes[curSection].mustHitSection && note.x > GRID_SIZE * 3)){
+					else if (bfDrumPlay && ((_song.notes[curSection].mustHitSection && note.x <= GRID_SIZE * 3) || (!_song.notes[curSection].mustHitSection && note.x > GRID_SIZE * 3))){
 						switch (note.noteData)
 						{
 							case 0:
-								playertapl.play(true);
+								FlxG.sound.play("assets/sounds/playertapl" + TitleState.soundExt);
 							case 1:
-								playertapd.play(true);
+								FlxG.sound.play("assets/sounds/playertapd" + TitleState.soundExt);
 							case 2:
-								playertapu.play(true);
+								FlxG.sound.play("assets/sounds/playertapu" + TitleState.soundExt);
 							case 3:
-								playertapr.play(true);
+								FlxG.sound.play("assets/sounds/playertapr" + TitleState.soundExt);
 						}
 					}
 					

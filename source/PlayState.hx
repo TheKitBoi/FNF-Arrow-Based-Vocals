@@ -207,25 +207,31 @@ class PlayState extends MusicBeatState
 		Conductor.mapBPMChanges(SONG);
 		Conductor.changeBPM(SONG.bpm);
 
-		playertapu = new FlxSound().loadEmbedded('assets/sounds/playertapu' + TitleState.soundExt);
-		FlxG.sound.list.add(playertapu);
+		//playertapu = FlxG.sound.load('assets/sounds/playertapu' + TitleState.soundExt);
+		//FlxG.sound.list.add(playertapu);
 		//playertapu.volume = 0.5;
 
-		playertapd = new FlxSound().loadEmbedded('assets/sounds/playertapd' + TitleState.soundExt);
-		FlxG.sound.list.add(playertapd);
+		//playertapd = FlxG.sound.load('assets/sounds/playertapd' + TitleState.soundExt);
+		//FlxG.sound.list.add(playertapd);
 		//playertapd.volume = 0.5;
 
-		playertapl = new FlxSound().loadEmbedded('assets/sounds/playertapl' + TitleState.soundExt);
-		FlxG.sound.list.add(playertapl);
+		//playertapl = FlxG.sound.load('assets/sounds/playertapl' + TitleState.soundExt);
+		//FlxG.sound.list.add(playertapl);
 		//playertapl.volume = 0.6;
 
-		playertapr = new FlxSound().loadEmbedded('assets/sounds/playertapr' + TitleState.soundExt);
-		FlxG.sound.list.add(playertapr);
+		//playertapr = FlxG.sound.load('assets/sounds/playertapr' + TitleState.soundExt);
+		//FlxG.sound.list.add(playertapr);
 		//playertapr.volume = 0.6;
 
-		playertapm = new FlxSound().loadEmbedded('assets/sounds/playertapm' + TitleState.soundExt);
-		FlxG.sound.list.add(playertapm);
-		playertapm.volume = 0.6;
+		//playertapm = FlxG.sound.load('assets/sounds/playertapm' + TitleState.soundExt);
+		//FlxG.sound.list.add(playertapm);
+		//playertapm.volume = 0.6;
+
+		FlxG.sound.cache('assets/sounds/playertapu' + TitleState.soundExt);
+		FlxG.sound.cache('assets/sounds/playertapd' + TitleState.soundExt);
+		FlxG.sound.cache('assets/sounds/playertapl' + TitleState.soundExt);
+		FlxG.sound.cache('assets/sounds/playertapr' + TitleState.soundExt);
+		FlxG.sound.cache('assets/sounds/playertapm' + TitleState.soundExt);
 
 		gradeup = FlxG.sound.load('assets/sounds/gradeup' + TitleState.soundExt);
 		//FlxG.sound.list.add(gradeup);
@@ -2373,8 +2379,10 @@ class PlayState extends MusicBeatState
 			FlxG.sound.play('assets/sounds/missnote' + FlxG.random.int(1, 3) + TitleState.soundExt, FlxG.random.float(0.1, 0.2));
 			// FlxG.sound.play('assets/sounds/missnote1' + TitleState.soundExt, 1, false);
 			// FlxG.log.add('played imss note');
+			//DD: Miss sound addition for better clarity
 			if (TitleState.auditoryFeedback)
-				playertapm.play(true);
+				FlxG.sound.play('assets/sounds/playertapm' + TitleState.soundExt);
+			//playertapm.play(true);
 
 			boyfriend.stunned = true;
 
@@ -2440,13 +2448,13 @@ class PlayState extends MusicBeatState
 				switch (note.noteData)
 				{
 					case 0:
-						playertapl.play(true);
+						FlxG.sound.play("assets/sounds/playertapl" + TitleState.soundExt);
 					case 1:
-						playertapd.play(true);
+						FlxG.sound.play("assets/sounds/playertapd" + TitleState.soundExt);
 					case 2:
-						playertapu.play(true);
+						FlxG.sound.play("assets/sounds/playertapu" + TitleState.soundExt);
 					case 3:
-						playertapr.play(true);
+						FlxG.sound.play("assets/sounds/playertapr" + TitleState.soundExt);
 				}
 			}
 
