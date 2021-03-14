@@ -136,10 +136,10 @@ class PlayState extends MusicBeatState
 	var filterMap:Map<String, {filter:BitmapFilter, ?onUpdate:Void->Void}>;
 	var gradeLevel:Int = 0;
 	var playerGrade:Int = 0;
-	var gradeup:FlxSound;
-	var gradedown:FlxSound;
-	var phrasegood:FlxSound;
-	var phrasebad:FlxSound;
+	// var gradeup:FlxSound;
+	// var gradedown:FlxSound;
+	// var phrasegood:FlxSound;
+	// var phrasebad:FlxSound;
 	var gradeTxtGood:FlxText;
 	var gradeTxtBad:FlxText;
 	var gradeTxtAwful:FlxText;
@@ -233,17 +233,22 @@ class PlayState extends MusicBeatState
 		FlxG.sound.cache('assets/sounds/playertapr' + TitleState.soundExt);
 		FlxG.sound.cache('assets/sounds/playertapm' + TitleState.soundExt);
 
-		gradeup = FlxG.sound.load('assets/sounds/gradeup' + TitleState.soundExt);
+		//gradeup = FlxG.sound.load('assets/sounds/gradeup' + TitleState.soundExt);
 		//FlxG.sound.list.add(gradeup);
 
-		gradedown = FlxG.sound.load('assets/sounds/gradedown' + TitleState.soundExt);
+		//gradedown = FlxG.sound.load('assets/sounds/gradedown' + TitleState.soundExt);
 		//FlxG.sound.list.add(gradedown);
 
-		phrasegood = FlxG.sound.load('assets/sounds/phrasegood' + TitleState.soundExt);
+		//phrasegood = FlxG.sound.load('assets/sounds/phrasegood' + TitleState.soundExt);
 		//FlxG.sound.list.add(gradeup);
 
-		phrasebad = FlxG.sound.load('assets/sounds/phrasebad' + TitleState.soundExt);
+		//phrasebad = FlxG.sound.load('assets/sounds/phrasebad' + TitleState.soundExt);
 		//FlxG.sound.list.add(gradedown);
+
+		FlxG.sound.cache('assets/sounds/gradeup' + TitleState.soundExt);
+		FlxG.sound.cache('assets/sounds/gradedown' + TitleState.soundExt);
+		FlxG.sound.cache('assets/sounds/phrasegood' + TitleState.soundExt);
+		FlxG.sound.cache('assets/sounds/phrasebad' + TitleState.soundExt);
 
 		if (FileSystem.exists("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt)){
 			FlxG.sound.cache("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt);
@@ -1824,30 +1829,30 @@ class PlayState extends MusicBeatState
 			{
 				case 1:
 					if (playerGrade > 0){
-						gradeup.play();
+						FlxG.sound.play('assets/sounds/gradeup' + TitleState.soundExt);
 						goGood();
 					}
 				case 3:
 					if (playerGrade > 1){
-						gradeup.play();
+						FlxG.sound.play('assets/sounds/gradeup' + TitleState.soundExt);
 						goBad();
 					}
 			}
 			if (gradeLevel > 0)
 				gradeLevel--;
-			phrasegood.play();
+			FlxG.sound.play('assets/sounds/phrasegood' + TitleState.soundExt);
 		}
 		else if (prevGradeHealth < 0){
 			switch (gradeLevel)
 			{
 				case 1:
 					if (playerGrade == 0){
-						gradedown.play();
+						FlxG.sound.play('assets/sounds/gradedown' + TitleState.soundExt);
 						goBad();
 					}
 				case 3:
 					if (playerGrade < 2){
-						gradedown.play();
+						FlxG.sound.play('assets/sounds/gradedown' + TitleState.soundExt);
 						goAwful();
 					}
 				case 5:
@@ -1855,7 +1860,7 @@ class PlayState extends MusicBeatState
 			}
 			if (gradeLevel < 6)
 				gradeLevel++;
-			phrasebad.play();
+			FlxG.sound.play('assets/sounds/phrasebad' + TitleState.soundExt);
 		}
 		if (!doFlicker && gradeLevel % 2 == 1)
 			startFlicker();
@@ -2382,7 +2387,7 @@ class PlayState extends MusicBeatState
 			//DD: Miss sound addition for better clarity
 			if (TitleState.auditoryFeedback)
 				FlxG.sound.play('assets/sounds/playertapm' + TitleState.soundExt);
-			//playertapm.play(true);
+				//playertapm.play(true);
 
 			boyfriend.stunned = true;
 
