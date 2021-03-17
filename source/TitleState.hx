@@ -45,6 +45,7 @@ class TitleState extends MusicBeatState
 	static public var auditoryFeedback:Bool = false;
 	static public var requireGood:Bool = true;
 	static public var oldTiming:Bool = false;
+	static public var enableCool:Bool = true;
 
 	override public function create():Void
 	{

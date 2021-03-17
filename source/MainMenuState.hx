@@ -36,6 +36,7 @@ class MainMenuState extends MusicBeatState
 	var checkAuditory:FlxText;
 	var checkRequireGood:FlxText;
 	var checkOldTiming:FlxText;
+	var checkEnableCool:FlxText;
 
 	override function create()
 	{
@@ -103,18 +104,22 @@ class MainMenuState extends MusicBeatState
 
 		changeItem();
 
-		//checkAuditory = new FlxUICheckBox(FlxG.width - 300, FlxG.height - 150, FlxUIAssets.IMG_CHECK_BOX, FlxUIAssets.IMG_CHECK_MARK, "Auditory Feedback (Left Arrow Button)");
-		checkAuditory = new FlxText(5, FlxG.height - 150, 0, "" + TitleState.auditoryFeedback, 12);
+		checkAuditory = new FlxText(5, FlxG.height - 148, 0, "" + TitleState.auditoryFeedback, 12);
 		checkAuditory.scrollFactor.set();
 		checkAuditory.setFormat("VCR OSD Mono", 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(checkAuditory);
 
-		checkRequireGood = new FlxText(5, FlxG.height - 100, 0, "" + TitleState.requireGood, 12);
+		checkRequireGood = new FlxText(5, FlxG.height - 124, 0, "" + TitleState.requireGood, 12);
 		checkRequireGood.scrollFactor.set();
 		checkRequireGood.setFormat("VCR OSD Mono", 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(checkRequireGood);
 
-		checkOldTiming = new FlxText(5, FlxG.height - 50, 0, "" + TitleState.requireGood, 12);
+		checkEnableCool = new FlxText(5, FlxG.height - 100, 0, "" + TitleState.requireGood, 12);
+		checkEnableCool.scrollFactor.set();
+		checkEnableCool.setFormat("VCR OSD Mono", 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		add(checkEnableCool);
+
+		checkOldTiming = new FlxText(5, FlxG.height - 76, 0, "" + TitleState.requireGood, 12);
 		checkOldTiming.scrollFactor.set();
 		checkOldTiming.setFormat("VCR OSD Mono", 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(checkOldTiming);
@@ -133,6 +138,7 @@ class MainMenuState extends MusicBeatState
 
 		checkAuditory.text = "Auditory Feedback (Press O to toggle): " + TitleState.auditoryFeedback;
 		checkRequireGood.text = "Require Good Rank at Song End (Press P to toggle): " + TitleState.requireGood;
+		checkEnableCool.text = "Enable Freestyling + Cool Rank (Press K to toggle): " + TitleState.enableCool;
 		checkOldTiming.text = "Grading Style (Press L to toggle): ";
 		if (TitleState.oldTiming)
 			checkOldTiming.text += "Interval-based";
@@ -162,6 +168,17 @@ class MainMenuState extends MusicBeatState
 				FlxG.save.data.oldTiming = TitleState.oldTiming;
 				FlxG.save.flush();
 			}
+
+			if (FlxG.keys.justPressed.K)
+				{
+					FlxG.sound.play('assets/sounds/scrollMenu' + TitleState.soundExt);
+					if (TitleState.enableCool)
+						TitleState.enableCool = false;
+					else
+						TitleState.enableCool = true;
+					FlxG.save.data.enableCool = TitleState.enableCool;
+					FlxG.save.flush();
+				}
 
 			if (FlxG.keys.justPressed.P)
 			{
