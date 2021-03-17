@@ -44,6 +44,7 @@ class TitleState extends MusicBeatState
 
 	static public var auditoryFeedback:Bool = false;
 	static public var requireGood:Bool = true;
+	static public var oldTiming:Bool = false;
 
 	override public function create():Void
 	{
@@ -102,6 +103,8 @@ class TitleState extends MusicBeatState
 			auditoryFeedback = FlxG.save.data.auditoryFeedback;
 		if (FlxG.save.data.requireGood != null)
 			requireGood = FlxG.save.data.requireGood;
+		if (FlxG.save.data.oldTiming != null)
+			oldTiming = FlxG.save.data.oldTiming;
 	}
 
 	var logoBl:FlxSprite;

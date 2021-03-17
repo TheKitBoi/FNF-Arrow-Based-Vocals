@@ -152,6 +152,8 @@ class PlayState extends MusicBeatState
 	var flickerText:FlxText = null;
 	var doFlicker:Bool = false;
 
+	var isSilence:Bool = false;
+
 	override public function create()
 	{
 		//Enable filters
@@ -788,7 +790,7 @@ class PlayState extends MusicBeatState
 		//add(healthBar);
 
 		scoreTxt = new FlxText(healthBarBG.x - 190, healthBarBG.y + 30, 0, "", 20);
-		scoreTxt.setFormat("assets/fonts/vcr.ttf", 16, FlxColor.WHITE, RIGHT);
+		scoreTxt.setFormat("assets/fonts/vcr.ttf", 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		scoreTxt.scrollFactor.set();
 		add(scoreTxt);
 
@@ -1423,10 +1425,23 @@ class PlayState extends MusicBeatState
 				// phillyCityLights.members[curLight].alpha -= (Conductor.crochet / 1000) * FlxG.elapsed;
 		}
 
+
 		super.update(elapsed);
 
-		//scoreTxt.text = "Score:" + songScore + " P:" + prevGradeHealth + " C:" + gradeHealth + " N:" + nextGradeHealth + " B:" + curBeat + " B/8:" + Math.floor(curBeat/8);
+		//scoreTxt.text = "Score:" + songScore + " P:" + prevGradeHealth + " C:" + gradeHealth + " N:" + nextGradeHealth + " B:" + curBeat + " B/8:" + Math.floor(curBeat/8) + " Silence:" + isSilence;
 		scoreTxt.text = "Score:" + songScore;
+
+		if (!TitleState.oldTiming){
+			isSilence = true;
+			notes.forEachExists(function(daNote:Note)
+			{
+				if (daNote.mustPress && daNote.y < FlxG.height)
+				{
+					isSilence = false;
+					gradingDone = false;
+				}
+			});
+		}
 
 		if (FlxG.keys.justPressed.ENTER && startedCountdown && canPause)
 		{
@@ -1476,12 +1491,18 @@ class PlayState extends MusicBeatState
 		else
 			iconP2.animation.curAnim.curFrame = 0;
 
-		
-		if (curBeat % 8 == 0 && !gradingDone){
-			doParappaGrading();
+		if (TitleState.oldTiming){
+			if (curBeat % 8 == 0 && !gradingDone){
+				doParappaGrading();
+			}
+			else if (curBeat % 8 == 1)
+				gradingDone = false;
 		}
-		else if (curBeat % 8 == 1)
-			gradingDone = false;
+		else{
+			if (!startingSong && isSilence && !gradingDone)
+				doParappaGrading();
+		}
+		
 
 		flickerTick++;
 		if (flickerTick % 5 == 0 && doFlicker){
@@ -1934,7 +1955,8 @@ class PlayState extends MusicBeatState
 	function endSong():Void
 	{
 		endingSong = true;
-		doParappaGrading();
+		if (TitleState.oldTiming)
+			doParappaGrading();
 		if (playerGrade > 0 && TitleState.requireGood){
 			health = 0;
 			return;
@@ -2486,7 +2508,9 @@ class PlayState extends MusicBeatState
 
 			if (note.noteData >= 0){
 				//health += 0.023;
-				if (noteGradeSection == curGradeSection)
+				if (!TitleState.oldTiming)
+					gradeHealth += 0.023;
+				else if (noteGradeSection == curGradeSection)
 					gradeHealth += 0.023;
 				else if (noteGradeSection == curGradeSection + 1)
 					nextGradeHealth += 0.023;
@@ -2494,7 +2518,9 @@ class PlayState extends MusicBeatState
 			}
 			else{
 				//health += 0.004;
-				if (noteGradeSection == curGradeSection)
+				if (!TitleState.oldTiming)
+					gradeHealth += 0.023;
+				else if (noteGradeSection == curGradeSection)
 					gradeHealth += 0.004;
 				else if (noteGradeSection == curGradeSection + 1)
 					nextGradeHealth += 0.004;

@@ -35,6 +35,7 @@ class MainMenuState extends MusicBeatState
 
 	var checkAuditory:FlxText;
 	var checkRequireGood:FlxText;
+	var checkOldTiming:FlxText;
 
 	override function create()
 	{
@@ -103,15 +104,20 @@ class MainMenuState extends MusicBeatState
 		changeItem();
 
 		//checkAuditory = new FlxUICheckBox(FlxG.width - 300, FlxG.height - 150, FlxUIAssets.IMG_CHECK_BOX, FlxUIAssets.IMG_CHECK_MARK, "Auditory Feedback (Left Arrow Button)");
-		checkAuditory = new FlxText(5, FlxG.height - 150, 0, "Auditory Feedback (Press O to toggle): " + TitleState.auditoryFeedback, 12);
+		checkAuditory = new FlxText(5, FlxG.height - 150, 0, "" + TitleState.auditoryFeedback, 12);
 		checkAuditory.scrollFactor.set();
 		checkAuditory.setFormat("VCR OSD Mono", 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(checkAuditory);
 
-		checkRequireGood = new FlxText(5, FlxG.height - 100, 0, "Require Good Rank at Song End (Press P to toggle): " + TitleState.requireGood, 12);
+		checkRequireGood = new FlxText(5, FlxG.height - 100, 0, "" + TitleState.requireGood, 12);
 		checkRequireGood.scrollFactor.set();
 		checkRequireGood.setFormat("VCR OSD Mono", 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(checkRequireGood);
+
+		checkOldTiming = new FlxText(5, FlxG.height - 50, 0, "" + TitleState.requireGood, 12);
+		checkOldTiming.scrollFactor.set();
+		checkOldTiming.setFormat("VCR OSD Mono", 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		add(checkOldTiming);
 
 		super.create();
 	}
@@ -125,6 +131,14 @@ class MainMenuState extends MusicBeatState
 			FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
 		}
 
+		checkAuditory.text = "Auditory Feedback (Press O to toggle): " + TitleState.auditoryFeedback;
+		checkRequireGood.text = "Require Good Rank at Song End (Press P to toggle): " + TitleState.requireGood;
+		checkOldTiming.text = "Grading Style (Press L to toggle): ";
+		if (TitleState.oldTiming)
+			checkOldTiming.text += "Interval-based";
+		else
+			checkOldTiming.text += "Break-based (recommended in most cases)";
+
 		if (!selectedSomethin)
 		{
 			if (FlxG.keys.justPressed.O)
@@ -134,8 +148,18 @@ class MainMenuState extends MusicBeatState
 					TitleState.auditoryFeedback = false;
 				else
 					TitleState.auditoryFeedback = true;
-				checkAuditory.text = "Auditory Feedback (Press O to toggle): " + TitleState.auditoryFeedback;
 				FlxG.save.data.auditoryFeedback = TitleState.auditoryFeedback;
+				FlxG.save.flush();
+			}
+
+			if (FlxG.keys.justPressed.L)
+			{
+				FlxG.sound.play('assets/sounds/scrollMenu' + TitleState.soundExt);
+				if (TitleState.oldTiming)
+					TitleState.oldTiming = false;
+				else
+					TitleState.oldTiming = true;
+				FlxG.save.data.oldTiming = TitleState.oldTiming;
 				FlxG.save.flush();
 			}
 
