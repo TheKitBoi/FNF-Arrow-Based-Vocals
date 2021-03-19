@@ -2627,7 +2627,7 @@ class PlayState extends MusicBeatState
 					freestyleHealth += 1;
 					//gradeHealth += 0.01;
 					if (playerGrade == -1)
-						songScore += 100;
+						songScore += 200;
 				}
 			}
 			lastFreestyleHit = Conductor.songPosition;
@@ -2668,7 +2668,7 @@ class PlayState extends MusicBeatState
 		freestyleSound.stop();
 		if (freestyleCurrentArrow != freestylePrevArrow || restartIndex)
 			freestyleSoundIndex = 0;
-		if (holdIndex && freestyleCurrentArrow == freestylePrevArrow){
+		if (playerGrade == -1 && holdIndex && freestyleCurrentArrow == freestylePrevArrow){
 			if (freestyleSoundIndex == 0)
 				freestyleSoundIndex = daFreestyleArray.length-1;
 			else
