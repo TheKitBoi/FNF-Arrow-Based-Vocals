@@ -106,6 +106,8 @@ class TitleState extends MusicBeatState
 			requireGood = FlxG.save.data.requireGood;
 		if (FlxG.save.data.oldTiming != null)
 			oldTiming = FlxG.save.data.oldTiming;
+		if (FlxG.save.data.enableCool != null)
+			enableCool = FlxG.save.data.enableCool;
 	}
 
 	var logoBl:FlxSprite;
