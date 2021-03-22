@@ -13,6 +13,8 @@ import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import io.newgrounds.NG;
 import lime.app.Application;
+import flixel.addons.ui.FlxUICheckBox;
+import flixel.addons.ui.FlxUIAssets;
 
 using StringTools;
 
@@ -30,6 +32,11 @@ class MainMenuState extends MusicBeatState
 
 	var magenta:FlxSprite;
 	var camFollow:FlxObject;
+
+	var checkAuditory:FlxText;
+	var checkRequireGood:FlxText;
+	var checkOldTiming:FlxText;
+	var checkEnableCool:FlxText;
 
 	override function create()
 	{
@@ -97,6 +104,26 @@ class MainMenuState extends MusicBeatState
 
 		changeItem();
 
+		checkAuditory = new FlxText(5, FlxG.height - 148, 0, "" + TitleState.auditoryFeedback, 12);
+		checkAuditory.scrollFactor.set();
+		checkAuditory.setFormat("VCR OSD Mono", 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		add(checkAuditory);
+
+		checkRequireGood = new FlxText(5, FlxG.height - 124, 0, "" + TitleState.requireGood, 12);
+		checkRequireGood.scrollFactor.set();
+		checkRequireGood.setFormat("VCR OSD Mono", 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		add(checkRequireGood);
+
+		checkEnableCool = new FlxText(5, FlxG.height - 100, 0, "" + TitleState.requireGood, 12);
+		checkEnableCool.scrollFactor.set();
+		checkEnableCool.setFormat("VCR OSD Mono", 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		add(checkEnableCool);
+
+		checkOldTiming = new FlxText(5, FlxG.height - 76, 0, "" + TitleState.requireGood, 12);
+		checkOldTiming.scrollFactor.set();
+		checkOldTiming.setFormat("VCR OSD Mono", 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		add(checkOldTiming);
+
 		super.create();
 	}
 
@@ -109,8 +136,62 @@ class MainMenuState extends MusicBeatState
 			FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
 		}
 
+		checkAuditory.text = "Auditory Feedback (Press O to toggle): " + TitleState.auditoryFeedback;
+		checkRequireGood.text = "Require Good Rank at Song End (Press P to toggle): " + TitleState.requireGood;
+		checkEnableCool.text = "Enable Freestyling + Cool Rank (Press K to toggle): " + TitleState.enableCool;
+		checkOldTiming.text = "Grading Style (Press L to toggle): ";
+		if (TitleState.oldTiming)
+			checkOldTiming.text += "Interval-based";
+		else
+			checkOldTiming.text += "Break-based (recommended in most cases)";
+
 		if (!selectedSomethin)
 		{
+			if (FlxG.keys.justPressed.O)
+			{
+				FlxG.sound.play('assets/sounds/scrollMenu' + TitleState.soundExt);
+				if (TitleState.auditoryFeedback)
+					TitleState.auditoryFeedback = false;
+				else
+					TitleState.auditoryFeedback = true;
+				FlxG.save.data.auditoryFeedback = TitleState.auditoryFeedback;
+				FlxG.save.flush();
+			}
+
+			if (FlxG.keys.justPressed.L)
+			{
+				FlxG.sound.play('assets/sounds/scrollMenu' + TitleState.soundExt);
+				if (TitleState.oldTiming)
+					TitleState.oldTiming = false;
+				else
+					TitleState.oldTiming = true;
+				FlxG.save.data.oldTiming = TitleState.oldTiming;
+				FlxG.save.flush();
+			}
+
+			if (FlxG.keys.justPressed.K)
+				{
+					FlxG.sound.play('assets/sounds/scrollMenu' + TitleState.soundExt);
+					if (TitleState.enableCool)
+						TitleState.enableCool = false;
+					else
+						TitleState.enableCool = true;
+					FlxG.save.data.enableCool = TitleState.enableCool;
+					FlxG.save.flush();
+				}
+
+			if (FlxG.keys.justPressed.P)
+			{
+				FlxG.sound.play('assets/sounds/scrollMenu' + TitleState.soundExt);
+				if (TitleState.requireGood)
+					TitleState.requireGood = false;
+				else
+					TitleState.requireGood = true;
+				checkRequireGood.text = "Require Good Rank at Song End (Press P to toggle): " + TitleState.requireGood;
+				FlxG.save.data.requireGood = TitleState.requireGood;
+				FlxG.save.flush();
+			}
+
 			if (controls.UP_P)
 			{
 				FlxG.sound.play('assets/sounds/scrollMenu' + TitleState.soundExt);
