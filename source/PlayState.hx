@@ -43,6 +43,7 @@ import openfl.display.BlendMode;
 import openfl.display.StageQuality;
 import openfl.filters.ShaderFilter;
 import Conductor.BPMChangeEvent;
+import flixel.system.FlxAssets;
 
 using StringTools;
 
@@ -168,6 +169,7 @@ class PlayState extends MusicBeatState
 	private var freestyleSoundsD:Array<FlxSound> = [];
 	var freestyleSoundIndex:Int = 0;
 	var freestylePrevArrow:Int = -1;
+	var coolSong:FlxSoundAsset;
 
 	override public function create()
 	{
@@ -275,23 +277,25 @@ class PlayState extends MusicBeatState
 			FlxG.sound.cache("assets/music/" + SONG.song + "_InstBad" + TitleState.soundExt);
 		}
 		if (FileSystem.exists("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt)){
-			FlxG.sound.cache("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt);
+			coolSong = openfl.media.Sound.fromFile("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt);
+			//FlxG.sound.cache("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt);
+
 		}
 
 		var checkFreestyleFiles:Int = 1;
 		var checkFreestyleArrows:Array<String> = ["L", "R", "U", "D"];
 		for (i in checkFreestyleArrows){
 			while (FileSystem.exists("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt)){
-				FlxG.sound.cache("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt);
+				//FlxG.sound.cache("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt);
 				
 				if (i == "L")
-					freestyleSoundsL.push(FlxG.sound.load("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt));
+					freestyleSoundsL.push(new FlxSound().loadEmbedded(openfl.media.Sound.fromFile("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt)));
 				else if (i == "R")
-					freestyleSoundsR.push(FlxG.sound.load("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt));
+					freestyleSoundsR.push(new FlxSound().loadEmbedded(openfl.media.Sound.fromFile("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt)));
 				else if (i == "U")
-					freestyleSoundsU.push(FlxG.sound.load("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt));
+					freestyleSoundsU.push(new FlxSound().loadEmbedded(openfl.media.Sound.fromFile("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt)));
 				else if (i == "D")
-					freestyleSoundsD.push(FlxG.sound.load("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt));
+					freestyleSoundsD.push(new FlxSound().loadEmbedded(openfl.media.Sound.fromFile("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt)));
 				
 				checkFreestyleFiles++;
 			}
@@ -1482,6 +1486,10 @@ class PlayState extends MusicBeatState
 		}
 
 
+		for (sndarray in [freestyleSoundsL, freestyleSoundsR, freestyleSoundsU, freestyleSoundsD])
+			for (snd in sndarray)
+				snd.update(FlxG.elapsed);
+
 		super.update(elapsed);
 
 		//scoreTxt.text = "Score:" + songScore + " P:" + prevGradeHealth + " C:" + gradeHealth + " N:" + nextGradeHealth + " Silence:" + isSilence + " PT:" + daphraseFrames + " F:" + freestyleHealth/daphraseFrames*1000 + " G:" + gradeLevel;
@@ -1506,6 +1514,7 @@ class PlayState extends MusicBeatState
 
 		if (!startingSong)
 			daphraseFrames++;
+
 
 		if (FlxG.keys.justPressed.ENTER && startedCountdown && canPause)
 		{
@@ -2031,7 +2040,7 @@ class PlayState extends MusicBeatState
 		if (FileSystem.exists("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt)){
 			
 			if (!startingSong){
-				FlxG.sound.playMusic("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt, 1, false);
+				FlxG.sound.playMusic(coolSong, 1, false);
 				FlxG.sound.music.time = Conductor.songPosition;
 				resyncVocals();
 				FlxG.sound.music.onComplete = endSong;
