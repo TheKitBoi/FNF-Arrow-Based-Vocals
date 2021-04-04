@@ -1,6 +1,8 @@
 package;
 
+#if desktop
 import sys.FileSystem;
+#end
 import openfl.filters.ColorMatrixFilter;
 import openfl.filters.BitmapFilter;
 import openfl.filters.BlurFilter;
@@ -270,6 +272,7 @@ class PlayState extends MusicBeatState
 		FlxG.sound.cache('assets/sounds/phrasegood' + TitleState.soundExt);
 		FlxG.sound.cache('assets/sounds/phrasebad' + TitleState.soundExt);
 
+		#if desktop
 		if (FileSystem.exists("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt)){
 			FlxG.sound.cache("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt);
 		}
@@ -279,12 +282,24 @@ class PlayState extends MusicBeatState
 		if (FileSystem.exists("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt)){
 			coolSong = openfl.media.Sound.fromFile("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt);
 			//FlxG.sound.cache("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt);
-
 		}
+		#else
+		if (Assets.exists("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt)){
+			FlxG.sound.cache("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt);
+		}
+		if (Assets.exists("assets/music/" + SONG.song + "_InstBad" + TitleState.soundExt)){
+			FlxG.sound.cache("assets/music/" + SONG.song + "_InstBad" + TitleState.soundExt);
+		}
+		if (Assets.exists("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt)){
+			coolSong = openfl.media.Sound.fromFile("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt);
+		}
+		#end
 
 		var checkFreestyleFiles:Int = 1;
 		var checkFreestyleArrows:Array<String> = ["L", "R", "U", "D"];
 		for (i in checkFreestyleArrows){
+			var checkFileExists:Bool = false;
+			#if desktop
 			while (FileSystem.exists("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt)){
 				//FlxG.sound.cache("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt);
 				
@@ -300,6 +315,21 @@ class PlayState extends MusicBeatState
 				checkFreestyleFiles++;
 			}
 			checkFreestyleFiles = 1;
+			#else
+			while (Assets.exists("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt)){
+				if (i == "L")
+					freestyleSoundsL.push(new FlxSound().loadEmbedded("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt));
+				else if (i == "R")
+					freestyleSoundsR.push(new FlxSound().loadEmbedded("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt));
+				else if (i == "U")
+					freestyleSoundsU.push(new FlxSound().loadEmbedded("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt));
+				else if (i == "D")
+					freestyleSoundsD.push(new FlxSound().loadEmbedded("assets/sounds/freestyle/" + SONG.song + "_" + i + checkFreestyleFiles + TitleState.soundExt));
+				
+				checkFreestyleFiles++;
+			}
+			checkFreestyleFiles = 1;
+			#end
 		}
 
 		if (freestyleSoundsL.length == 0)
@@ -1172,7 +1202,13 @@ class PlayState extends MusicBeatState
 		lastReportedPlayheadPosition = 0;
 
 		if (!paused){
+			#if desktop
 			switch (playerGrade){
+				case -1:
+					if (FileSystem.exists("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt))
+						FlxG.sound.playMusic(coolSong, 1, false);
+					else
+						FlxG.sound.playMusic("assets/music/" + SONG.song + "_Inst" + TitleState.soundExt, 1, false);
 				case 0:
 					FlxG.sound.playMusic("assets/music/" + SONG.song + "_Inst" + TitleState.soundExt, 1, false);
 				case 1:
@@ -1185,8 +1221,28 @@ class PlayState extends MusicBeatState
 						FlxG.sound.playMusic("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt, 1, false);
 					else
 						FlxG.sound.playMusic("assets/music/" + SONG.song + "_Inst" + TitleState.soundExt, 1, false);
-
 			}
+			#else
+			switch (playerGrade){
+				case -1:
+					if (Assets.exists("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt))
+						FlxG.sound.playMusic("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt, 1, false);
+					else
+						FlxG.sound.playMusic("assets/music/" + SONG.song + "_Inst" + TitleState.soundExt, 1, false);
+				case 0:
+					FlxG.sound.playMusic("assets/music/" + SONG.song + "_Inst" + TitleState.soundExt, 1, false);
+				case 1:
+					if (Assets.exists("assets/music/" + SONG.song + "_InstBad" + TitleState.soundExt))
+						FlxG.sound.playMusic("assets/music/" + SONG.song + "_InstBad" + TitleState.soundExt, 1, false);
+					else
+						FlxG.sound.playMusic("assets/music/" + SONG.song + "_Inst" + TitleState.soundExt, 1, false);
+				case 2:
+					if (Assets.exists("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt))
+						FlxG.sound.playMusic("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt, 1, false);
+					else
+						FlxG.sound.playMusic("assets/music/" + SONG.song + "_Inst" + TitleState.soundExt, 1, false);
+			}
+			#end
 			
 		}
 			
@@ -1485,10 +1541,6 @@ class PlayState extends MusicBeatState
 				// phillyCityLights.members[curLight].alpha -= (Conductor.crochet / 1000) * FlxG.elapsed;
 		}
 
-
-		for (sndarray in [freestyleSoundsL, freestyleSoundsR, freestyleSoundsU, freestyleSoundsD])
-			for (snd in sndarray)
-				snd.update(FlxG.elapsed);
 
 		super.update(elapsed);
 
@@ -1880,6 +1932,10 @@ class PlayState extends MusicBeatState
 				filter.onUpdate();
 		}
 
+		for (sndarray in [freestyleSoundsL, freestyleSoundsR, freestyleSoundsU, freestyleSoundsD])
+			for (snd in sndarray)
+				snd.update(FlxG.elapsed);
+
 	}
 
 	function startFlicker():Void{
@@ -2037,7 +2093,13 @@ class PlayState extends MusicBeatState
 		// 	filters.pop();
 		changedSongGrade = false;
 		filters.resize(0);
-		if (FileSystem.exists("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt)){
+		var checkFileExists:Bool = false;
+		#if desktop
+		checkFileExists = FileSystem.exists("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt);
+		#else
+		checkFileExists = Assets.exists("assets/music/" + SONG.song + "_InstCool" + TitleState.soundExt);
+		#end
+		if (checkFileExists){
 			
 			if (!startingSong){
 				FlxG.sound.playMusic(coolSong, 1, false);
@@ -2062,7 +2124,8 @@ class PlayState extends MusicBeatState
 		// while (filters.length > 0)
 		// 	filters.pop();
 		filters.resize(0);
-		if (changedSongGrade && FileSystem.exists("assets/music/" + SONG.song + "_Inst" + TitleState.soundExt)){
+		var checkFileExists:Bool = false;
+		if (changedSongGrade){
 			if (!startingSong){
 				FlxG.sound.playMusic("assets/music/" + SONG.song + "_Inst" + TitleState.soundExt, 1, false);
 				FlxG.sound.music.time = Conductor.songPosition;
@@ -2087,7 +2150,13 @@ class PlayState extends MusicBeatState
 		filters.resize(0);
 		filters.push(filterMap.get("BlurBad").filter);
 		filters.push(filterMap.get("Bad").filter);
-		if (FileSystem.exists("assets/music/" + SONG.song + "_InstBad" + TitleState.soundExt)){
+		var checkFileExists:Bool = false;
+		#if desktop
+		checkFileExists = FileSystem.exists("assets/music/" + SONG.song + "_InstBad" + TitleState.soundExt);
+		#else
+		checkFileExists = Assets.exists("assets/music/" + SONG.song + "_InstBad" + TitleState.soundExt);
+		#end
+		if (checkFileExists){
 			
 			if (!startingSong){
 				FlxG.sound.playMusic("assets/music/" + SONG.song + "_InstBad" + TitleState.soundExt, 1, false);
@@ -2111,7 +2180,13 @@ class PlayState extends MusicBeatState
 		filters.resize(0);
 		filters.push(filterMap.get("BlurAwful").filter);
 		filters.push(filterMap.get("Awful").filter);
-		if (FileSystem.exists("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt)){
+		var checkFileExists:Bool = false;
+		#if desktop
+		checkFileExists = FileSystem.exists("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt);
+		#else
+		checkFileExists = Assets.exists("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt);
+		#end
+		if (checkFileExists){
 			if (!startingSong){
 				FlxG.sound.playMusic("assets/music/" + SONG.song + "_InstAwful" + TitleState.soundExt, 1, false);
 				FlxG.sound.music.time = Conductor.songPosition;
