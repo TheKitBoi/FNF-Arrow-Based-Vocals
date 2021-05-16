@@ -1,8 +1,11 @@
 package;
 
+import flixel.system.frontEnds.SoundFrontEnd;
+//import cpp.Int16;
 #if desktop
-import Discord.DiscordClient;
+//import Discord.DiscordClient;
 #end
+import sys.FileSystem;
 import Section.SwagSection;
 import Song.SwagSong;
 import WiggleEffect.WiggleEffectType;
@@ -46,6 +49,23 @@ using StringTools;
 
 class PlayState extends MusicBeatState
 {
+	//DD: Necessary OpenAL sound stuff
+	var dada = new SyllableSound(SONG.player2, "a");
+	var dadi = new SyllableSound(SONG.player2, "i");
+	var dadu = new SyllableSound(SONG.player2, "u");
+	var dade = new SyllableSound(SONG.player2, "e");
+	var dado = new SyllableSound(SONG.player2, "o");
+	
+	var bfa = new SyllableSound(SONG.player1, "a");
+	var bfi = new SyllableSound(SONG.player1, "i");
+	var bfu = new SyllableSound(SONG.player1, "u");
+	var bfe = new SyllableSound(SONG.player1, "e");
+	var bfo = new SyllableSound(SONG.player1, "o");
+	var bfholds:Map<Int, SyllableSound> = new Map<Int, SyllableSound>();
+	var freeID:Int = 1;
+	
+	var allSyllableSounds:Array<SyllableSound>;
+
 	public static var curStage:String = '';
 	public static var SONG:SwagSong;
 	public static var isStoryMode:Bool = false;
@@ -56,11 +76,6 @@ class PlayState extends MusicBeatState
 	var halloweenLevel:Bool = false;
 
 	private var vocals:FlxSound;
-	var playertapu:FlxSound;
-	var playertapd:FlxSound;
-	var playertapl:FlxSound;
-	var playertapr:FlxSound;
-	var playertapm:FlxSound;
 
 	private var dad:Character;
 	private var gf:Character;
@@ -160,34 +175,16 @@ class PlayState extends MusicBeatState
 		if (SONG == null)
 			SONG = Song.loadFromJson('tutorial');
 
+		//DD: If master vocal volume is null, make it not null
+		var checkifVolumeNull:Null<Float> = SONG.vocalVolume;
+		if (checkifVolumeNull == null){
+			SONG.vocalVolume = 1.0;
+		}
+
 		Conductor.mapBPMChanges(SONG);
 		Conductor.changeBPM(SONG.bpm);
 
-		//playertapu = FlxG.sound.load('assets/sounds/playertapu' + TitleState.soundExt);
-		//FlxG.sound.list.add(playertapu);
-		//playertapu.volume = 0.5;
-
-		//playertapd = FlxG.sound.load('assets/sounds/playertapd' + TitleState.soundExt);
-		//FlxG.sound.list.add(playertapd);
-		//playertapd.volume = 0.5;
-
-		//playertapl = FlxG.sound.load('assets/sounds/playertapl' + TitleState.soundExt);
-		//FlxG.sound.list.add(playertapl);
-		//playertapl.volume = 0.6;
-
-		//playertapr = FlxG.sound.load('assets/sounds/playertapr' + TitleState.soundExt);
-		//FlxG.sound.list.add(playertapr);
-		//playertapr.volume = 0.6;
-
-		//playertapm = FlxG.sound.load('assets/sounds/playertapm' + TitleState.soundExt);
-		//FlxG.sound.list.add(playertapm);
-		//playertapm.volume = 0.6;
-
-		FlxG.sound.cache('assets/sounds/playertapu' + TitleState.soundExt);
-		FlxG.sound.cache('assets/sounds/playertapd' + TitleState.soundExt);
-		FlxG.sound.cache('assets/sounds/playertapl' + TitleState.soundExt);
-		FlxG.sound.cache('assets/sounds/playertapr' + TitleState.soundExt);
-		FlxG.sound.cache('assets/sounds/playertapm' + TitleState.soundExt);
+		allSyllableSounds = [dada,dadi,dadu,dade,dado,bfa,bfi,bfu,bfe,bfo];
 
 		switch (SONG.song.toLowerCase())
 		{
@@ -255,7 +252,7 @@ class PlayState extends MusicBeatState
 		detailsPausedText = "Paused - " + detailsText;
 		
 		// Updating Discord Rich Presence.
-		DiscordClient.changePresence(detailsText, SONG.song + " (" + storyDifficultyText + ")", iconRPC);
+		//DiscordClient.changePresence(detailsText, SONG.song + " (" + storyDifficultyText + ")", iconRPC);
 		#end
 
 		switch (SONG.song.toLowerCase())
@@ -1060,7 +1057,7 @@ class PlayState extends MusicBeatState
 		songLength = FlxG.sound.music.length;
 
 		// Updating Discord Rich Presence (with Time Left)
-		DiscordClient.changePresence(detailsText, SONG.song + " (" + storyDifficultyText + ")", iconRPC, true, songLength);
+		//DiscordClient.changePresence(detailsText, SONG.song + " (" + storyDifficultyText + ")", iconRPC, true, songLength);
 		#end
 	}
 
@@ -1101,6 +1098,13 @@ class PlayState extends MusicBeatState
 			{
 				var daStrumTime:Float = songNotes[0];
 				var daNoteData:Int = Std.int(songNotes[1] % 4);
+				//DD: Add some note pitch stuff
+				var daNotePitch:Float = 1.0;
+				var daNoteSyllable:Int = -1;
+				if (songNotes[3] != null)
+					daNotePitch = songNotes[3];
+				if (songNotes[4] != null)
+					daNoteSyllable = songNotes[4];
 
 				var gottaHitNote:Bool = section.mustHitSection;
 
@@ -1119,9 +1123,19 @@ class PlayState extends MusicBeatState
 				swagNote.sustainLength = songNotes[2];
 				swagNote.scrollFactor.set(0, 0);
 
+				//DD: Note pitch stuff again
+				swagNote.notePitch = daNotePitch;
+				swagNote.noteSyllable = daNoteSyllable;
+
 				var susLength:Float = swagNote.sustainLength;
 
 				susLength = susLength / Conductor.stepCrochet;
+
+				if (susLength > 0){
+					swagNote.holdID = freeID;
+					freeID++;
+				}
+
 				unspawnNotes.push(swagNote);
 
 				for (susNote in 0...Math.floor(susLength))
@@ -1133,6 +1147,11 @@ class PlayState extends MusicBeatState
 					unspawnNotes.push(sustainNote);
 
 					sustainNote.mustPress = gottaHitNote;
+
+					sustainNote.holdID = swagNote.holdID;
+					sustainNote.noteSyllable = swagNote.noteSyllable;
+					sustainNote.notePitch = swagNote.notePitch;
+					sustainNote.sustainLength = (Math.floor(susLength) - susNote) * Conductor.stepCrochet;
 
 					if (sustainNote.mustPress)
 					{
@@ -1281,6 +1300,8 @@ class PlayState extends MusicBeatState
 			{
 				FlxG.sound.music.pause();
 				vocals.pause();
+				//stopSamples();
+
 			}
 
 			if (!startTimer.finished)
@@ -1299,6 +1320,12 @@ class PlayState extends MusicBeatState
 				resyncVocals();
 			}
 
+			/*//DD: Unpause vocal samples
+			for (i in allSyllableSounds){
+				if (i.isInUse())
+					i.resume();
+			}*/
+
 			if (!startTimer.finished)
 				startTimer.active = true;
 			paused = false;
@@ -1306,11 +1333,11 @@ class PlayState extends MusicBeatState
 			#if desktop
 			if (startTimer.finished)
 			{
-				DiscordClient.changePresence(detailsText, SONG.song + " (" + storyDifficultyText + ")", iconRPC, true, songLength - Conductor.songPosition);
+				//Client.changePresence(detailsText, SONG.song + " (" + storyDifficultyText + ")", iconRPC, true, songLength - Conductor.songPosition);
 			}
 			else
 			{
-				DiscordClient.changePresence(detailsText, SONG.song + " (" + storyDifficultyText + ")", iconRPC);
+				//DiscordClient.changePresence(detailsText, SONG.song + " (" + storyDifficultyText + ")", iconRPC);
 			}
 			#end
 		}
@@ -1325,11 +1352,11 @@ class PlayState extends MusicBeatState
 		{
 			if (Conductor.songPosition > 0.0)
 			{
-				DiscordClient.changePresence(detailsText, SONG.song + " (" + storyDifficultyText + ")", iconRPC, true, songLength - Conductor.songPosition);
+				//DiscordClient.changePresence(detailsText, SONG.song + " (" + storyDifficultyText + ")", iconRPC, true, songLength - Conductor.songPosition);
 			}
 			else
 			{
-				DiscordClient.changePresence(detailsText, SONG.song + " (" + storyDifficultyText + ")", iconRPC);
+				//DiscordClient.changePresence(detailsText, SONG.song + " (" + storyDifficultyText + ")", iconRPC);
 			}
 		}
 		#end
@@ -1342,7 +1369,7 @@ class PlayState extends MusicBeatState
 		#if desktop
 		if (health > 0 && !paused)
 		{
-			DiscordClient.changePresence(detailsPausedText, SONG.song + " (" + storyDifficultyText + ")", iconRPC);
+			//DiscordClient.changePresence(detailsPausedText, SONG.song + " (" + storyDifficultyText + ")", iconRPC);
 		}
 		#end
 
@@ -1352,6 +1379,7 @@ class PlayState extends MusicBeatState
 	function resyncVocals():Void
 	{
 		vocals.pause();
+		stopSamples();
 
 		FlxG.sound.music.play();
 		Conductor.songPosition = FlxG.sound.music.time;
@@ -1368,6 +1396,9 @@ class PlayState extends MusicBeatState
 		#if !debug
 		perfectMode = false;
 		#end
+
+		//FlxG.watch.addQuick("Array:", sourcesinuse);
+		//FlxG.watch.addQuick("ArraySize:", sourcesinuse.length);
 
 		if (FlxG.keys.justPressed.NINE)
 		{
@@ -1413,7 +1444,7 @@ class PlayState extends MusicBeatState
 				openSubState(new PauseSubState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
 		
 			#if desktop
-			DiscordClient.changePresence(detailsPausedText, SONG.song + " (" + storyDifficultyText + ")", iconRPC);
+			//Client.changePresence(detailsPausedText, SONG.song + " (" + storyDifficultyText + ")", iconRPC);
 			#end
 		}
 
@@ -1422,7 +1453,7 @@ class PlayState extends MusicBeatState
 			FlxG.switchState(new ChartingState());
 
 			#if desktop
-			DiscordClient.changePresence("Chart Editor", null, null, true);
+			//DiscordClient.changePresence("Chart Editor", null, null, true);
 			#end
 		}
 
@@ -1622,7 +1653,7 @@ class PlayState extends MusicBeatState
 			
 			#if desktop
 			// Game Over doesn't get his own variable because it's only used here
-			DiscordClient.changePresence("Game Over - " + detailsText, SONG.song + " (" + storyDifficultyText + ")", iconRPC);
+			//DiscordClient.changePresence("Game Over - " + detailsText, SONG.song + " (" + storyDifficultyText + ")", iconRPC);
 			#end
 		}
 
@@ -1667,7 +1698,8 @@ class PlayState extends MusicBeatState
 					daNote.clipRect = swagRect;
 				}
 
-				if (!daNote.mustPress && daNote.wasGoodHit)
+				//DD: Changed this if statement because I think the previous one hit notes a frame too late.
+				if (!daNote.mustPress && daNote.strumTime - Conductor.songPosition <= 0)
 				{
 					if (SONG.song != 'Tutorial')
 						camZooming = true;
@@ -1694,8 +1726,11 @@ class PlayState extends MusicBeatState
 
 					dad.holdTimer = 0;
 
-					if (SONG.needsVoices)
+					if (SONG.needsVoices){
 						vocals.volume = 1;
+					}
+					//DD: Play vocal samples for player2
+					handleVocalPlayback(daNote, dada, dadi, dadu, dade, dado);
 
 					daNote.kill();
 					notes.remove(daNote, true);
@@ -1730,6 +1765,13 @@ class PlayState extends MusicBeatState
 		if (FlxG.keys.justPressed.ONE)
 			endSong();
 		#end
+
+		//DD: Update vocal samples
+		for (i in allSyllableSounds){
+			if (i.isInUse())
+				i.update(FlxG.elapsed*1000, paused);
+		}
+
 	}
 
 	function endSong():Void
@@ -1764,7 +1806,7 @@ class PlayState extends MusicBeatState
 
 				if (SONG.validScore)
 				{
-					NGio.unlockMedal(60961);
+					//NGio.unlockMedal(60961);
 					Highscore.saveWeekScore(storyWeek, campaignScore, storyDifficulty);
 				}
 
@@ -1989,133 +2031,122 @@ class PlayState extends MusicBeatState
 		var controlArray:Array<Bool> = [leftP, downP, upP, rightP];
 
 		// FlxG.watch.addQuick('asdfa', upP);
-		if ((upP || rightP || downP || leftP) && !boyfriend.stunned && generatedMusic)
+		//DD: Rework inputs to tone down the jank. These changes may get nuked when week 7 source is public.
+		var possibleNotes:Array<Note> = [];
+		//var ignoreList:Array<Int> = [];
+
+		notes.forEachAlive(function(daNote:Note)
 		{
-			boyfriend.holdTimer = 0;
-
-			var possibleNotes:Array<Note> = [];
-
-			var ignoreList:Array<Int> = [];
-
-			notes.forEachAlive(function(daNote:Note)
+			if (daNote.canBeHit && daNote.mustPress && !daNote.tooLate && !daNote.wasGoodHit)
 			{
-				if (daNote.canBeHit && daNote.mustPress && !daNote.tooLate && !daNote.wasGoodHit)
-				{
-					// the sorting probably doesn't need to be in here? who cares lol
-					possibleNotes.push(daNote);
-					possibleNotes.sort((a, b) -> Std.int(a.strumTime - b.strumTime));
+				// the sorting probably doesn't need to be in here? who cares lol
+				possibleNotes.push(daNote);
+				//possibleNotes.sort((a, b) -> Std.int(a.strumTime - b.strumTime));
+				haxe.ds.ArraySort.sort(possibleNotes, (a, b) -> Std.int(a.strumTime - b.strumTime));
+				//ignoreList.push(daNote.noteData);
+			}
+		});
 
-					ignoreList.push(daNote.noteData);
-				}
-			});
-
-			if (possibleNotes.length > 0)
+		for (checkThisChucklenuts in [upP, rightP, downP, leftP]){
+			if (checkThisChucklenuts /*&& !boyfriend.stunned*/ && generatedMusic)
 			{
-				var daNote = possibleNotes[0];
-
-				if (perfectMode)
-					noteCheck(true, daNote);
-
-				// Jump notes
-				if (possibleNotes.length >= 2)
+				boyfriend.holdTimer = 0;
+				if (possibleNotes.length > 0)
 				{
-					if (possibleNotes[0].strumTime == possibleNotes[1].strumTime)
-					{
-						for (coolNote in possibleNotes)
-						{
-							if (controlArray[coolNote.noteData])
-								goodNoteHit(coolNote);
-							else
-							{
-								var inIgnoreList:Bool = false;
-								for (shit in 0...ignoreList.length)
-								{
-									if (controlArray[ignoreList[shit]])
-										inIgnoreList = true;
-								}
-								if (!inIgnoreList)
-									badNoteCheck();
-							}
+					//var daNote = possibleNotes[0];
+					var goodEnough:Bool = false;
+					var goodEnoughIndex:Int = -1;
+					for (i in 0...possibleNotes.length){
+						if (controlArray[possibleNotes[i].noteData]){
+							goodEnough = true;
+							goodEnoughIndex = i;
+							break;
 						}
 					}
-					else if (possibleNotes[0].noteData == possibleNotes[1].noteData)
-					{
-						noteCheck(controlArray[daNote.noteData], daNote);
+					if (perfectMode){
+						noteCheck(true, possibleNotes[0]);
+						possibleNotes.remove(possibleNotes[goodEnoughIndex]);
 					}
-					else
-					{
-						for (coolNote in possibleNotes)
-						{
-							noteCheck(controlArray[coolNote.noteData], coolNote);
-						}
+					else{
+						noteCheck(goodEnough, possibleNotes[goodEnoughIndex]);
+						possibleNotes.remove(possibleNotes[goodEnoughIndex]);
 					}
 				}
-				else // regular notes?
+				else
 				{
-					noteCheck(controlArray[daNote.noteData], daNote);
+					badNoteCheck();
 				}
-				/* 
-					if (controlArray[daNote.noteData])
-						goodNoteHit(daNote);
-				 */
-				// trace(daNote.noteData);
-				/* 
+			}
+		}
+
+		for (checkThisChucklenuts in [up, right, down, left]){
+			if (checkThisChucklenuts /*&& !boyfriend.stunned*/ && generatedMusic)
+			{
+				notes.forEachAlive(function(daNote:Note)
+				{
+					if (daNote.canBeHit && daNote.mustPress && daNote.isSustainNote)
+					{
 						switch (daNote.noteData)
 						{
-							case 2: // NOTES YOU JUST PRESSED
-								if (upP || rightP || downP || leftP)
-									noteCheck(upP, daNote);
-							case 3:
-								if (upP || rightP || downP || leftP)
-									noteCheck(rightP, daNote);
-							case 1:
-								if (upP || rightP || downP || leftP)
-									noteCheck(downP, daNote);
+							// NOTES YOU ARE HOLDING
 							case 0:
-								if (upP || rightP || downP || leftP)
-									noteCheck(leftP, daNote);
+								if (left)
+									goodNoteHit(daNote);
+							case 1:
+								if (down)
+									goodNoteHit(daNote);
+							case 2:
+								if (up)
+									goodNoteHit(daNote);
+							case 3:
+								if (right)
+									goodNoteHit(daNote);
 						}
-
-					//this is already done in noteCheck / goodNoteHit
-					if (daNote.wasGoodHit)
-					{
-						daNote.kill();
-						notes.remove(daNote, true);
-						daNote.destroy();
 					}
-				 */
-			}
-			else
-			{
-				badNoteCheck();
+				});
 			}
 		}
 
-		if ((up || right || down || left) && !boyfriend.stunned && generatedMusic)
-		{
-			notes.forEachAlive(function(daNote:Note)
+		//DD: Handle letting go of a sustain early
+		for (checkThisChucklenuts in [upR, rightR, downR, leftR]){
+			if (checkThisChucklenuts && generatedMusic)
 			{
-				if (daNote.canBeHit && daNote.mustPress && daNote.isSustainNote)
+				notes.forEachAlive(function(daNote:Note)
 				{
-					switch (daNote.noteData)
+					if (daNote.canBeHit && daNote.mustPress && daNote.isSustainNote)
 					{
-						// NOTES YOU ARE HOLDING
-						case 0:
-							if (left)
-								goodNoteHit(daNote);
-						case 1:
-							if (down)
-								goodNoteHit(daNote);
-						case 2:
-							if (up)
-								goodNoteHit(daNote);
-						case 3:
-							if (right)
-								goodNoteHit(daNote);
+						switch (daNote.noteData)
+						{
+							case 0:
+								if (leftR){
+									var sndtostop = bfholds[daNote.holdID];
+									if (sndtostop != null)
+										sndtostop.stop();
+								}
+							case 1:
+								if (downR){
+									var sndtostop = bfholds[daNote.holdID];
+									if (sndtostop != null)
+										sndtostop.stop();
+								}
+							case 2:
+								if (upR){
+									var sndtostop = bfholds[daNote.holdID];
+									if (sndtostop != null)
+										sndtostop.stop();
+								}
+							case 3:
+								if (rightR){
+									var sndtostop = bfholds[daNote.holdID];
+									if (sndtostop != null)
+										sndtostop.stop();
+								}
+						}
 					}
-				}
-			});
+				});
+			}
 		}
+	
 
 		if (boyfriend.holdTimer > Conductor.stepCrochet * 4 * 0.001 && !up && !down && !right && !left)
 		{
@@ -2178,9 +2209,6 @@ class PlayState extends MusicBeatState
 			FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
 			// FlxG.sound.play(Paths.sound('missnote1'), 1, false);
 			// FlxG.log.add('played imss note');
-			//DD: Miss sound addition for better clarity
-			FlxG.sound.play('assets/sounds/playertapm' + TitleState.soundExt);
-			//playertapm.play(true);
 
 			boyfriend.stunned = true;
 
@@ -2242,20 +2270,6 @@ class PlayState extends MusicBeatState
 				popUpScore(note.strumTime);
 				combo += 1;
 			}
-			//DD: Play drum sounds when player taps a note
-			if (!note.isSustainNote || boyfriend.holdTimer == 0){
-				switch (note.noteData)
-				{
-					case 0:
-						FlxG.sound.play("assets/sounds/playertapl" + TitleState.soundExt);
-					case 1:
-						FlxG.sound.play("assets/sounds/playertapd" + TitleState.soundExt);
-					case 2:
-						FlxG.sound.play("assets/sounds/playertapu" + TitleState.soundExt);
-					case 3:
-						FlxG.sound.play("assets/sounds/playertapr" + TitleState.soundExt);
-				}
-			}
 
 			if (note.noteData >= 0)
 				health += 0.023;
@@ -2285,12 +2299,58 @@ class PlayState extends MusicBeatState
 			note.wasGoodHit = true;
 			vocals.volume = 1;
 
+			//DD: Handle note and pitch for player1, similar to player2
+			handleVocalPlayback(note, bfa, bfi, bfu, bfe, bfo, bfholds);
+
 			if (!note.isSustainNote)
 			{
 				note.kill();
 				notes.remove(note, true);
 				note.destroy();
 			}
+		}
+	}
+
+	public static function handleVocalPlayback(note:Note, asource:SyllableSound, isource:SyllableSound, usource:SyllableSound, esource:SyllableSound, osource:SyllableSound, holds:Map<Int,SyllableSound> = null){
+		var playsnd:SyllableSound = asource;
+		
+		switch (note.noteSyllable){
+			case -1:
+				return;
+			case 0:
+				playsnd = asource;
+			case 1:
+				playsnd = isource;
+			case 2:
+				playsnd = usource;
+			case 3:
+				playsnd = esource;
+			case 4:
+				playsnd = osource;
+		}
+
+		//DD: Stop all other playing sounds (per player) to prevent them playing over each other
+			//Unless it's a sustain note trail
+		if (!note.isSustainNote){
+			for (i in [asource,isource,usource,esource,osource]){
+				if (i.isInUse())
+					i.stop();
+			}
+		}
+
+		//DD: The sole reason why I have to mess with OpenAL directly. Sound pitch adjustment.
+		playsnd.setPitch(note.notePitch);
+
+		if (note.sustainLength > 0){
+			if (!playsnd.isInUse()){
+				//playsnd.loopOn();
+				if (holds != null)
+					holds[note.holdID] = playsnd;
+				playsnd.play(note.sustainLength + Conductor.stepCrochet);
+			}	
+		}
+		else{
+			playsnd.play(Conductor.stepCrochet);
 		}
 	}
 
@@ -2510,6 +2570,19 @@ class PlayState extends MusicBeatState
 		if (isHalloween && FlxG.random.bool(10) && curBeat > lightningStrikeBeat + lightningOffset)
 		{
 			lightningStrikeShit();
+		}
+	}
+
+	override function switchTo(nextState:FlxState):Bool{
+		stopSamples();
+		return super.switchTo(nextState);
+	}
+
+	//DD: Self-explanatory
+	function stopSamples(){
+		for (i in allSyllableSounds){
+			i.stop();
+			//i.loopOff();
 		}
 	}
 

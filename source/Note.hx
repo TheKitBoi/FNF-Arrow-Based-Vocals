@@ -14,6 +14,12 @@ class Note extends FlxSprite
 {
 	public var strumTime:Float = 0;
 
+	//DD: Note pitch
+	public var notePitch:Float = 1.0;
+	//public var isLastSustain:Bool = false;
+	public var noteSyllable:Int = -1;
+	public var holdID:Int = 0;
+
 	public var mustPress:Bool = false;
 	public var noteData:Int = 0;
 	public var canBeHit:Bool = false;
@@ -131,12 +137,16 @@ class Note extends FlxSprite
 			{
 				case 2:
 					animation.play('greenholdend');
+					//isLastSustain = true;
 				case 3:
 					animation.play('redholdend');
+					//isLastSustain = true;
 				case 1:
 					animation.play('blueholdend');
+					//isLastSustain = true;
 				case 0:
 					animation.play('purpleholdend');
+					//isLastSustain = true;
 			}
 
 			updateHitbox();
@@ -152,12 +162,16 @@ class Note extends FlxSprite
 				{
 					case 0:
 						prevNote.animation.play('purplehold');
+						//prevNote.isLastSustain = false;
 					case 1:
 						prevNote.animation.play('bluehold');
+						//prevNote.isLastSustain = false;
 					case 2:
 						prevNote.animation.play('greenhold');
+						//prevNote.isLastSustain = false;
 					case 3:
 						prevNote.animation.play('redhold');
+						//prevNote.isLastSustain = false;
 				}
 
 				prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.5 * PlayState.SONG.speed;
@@ -175,7 +189,7 @@ class Note extends FlxSprite
 		{
 			// The * 0.5 is so that it's easier to hit them too late, instead of too early
 			if (strumTime > Conductor.songPosition - Conductor.safeZoneOffset
-				&& strumTime < Conductor.songPosition + (Conductor.safeZoneOffset * 0.5))
+				&& strumTime < Conductor.songPosition + Conductor.safeZoneOffset)
 				canBeHit = true;
 			else
 				canBeHit = false;

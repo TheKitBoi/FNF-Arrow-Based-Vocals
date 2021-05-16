@@ -22,6 +22,7 @@ class Conductor
 	public static var songPosition:Float;
 	public static var lastSongPos:Float;
 	public static var offset:Float = 0;
+	public static var masterVolume:Float = 0;
 
 	public static var safeFrames:Int = 10;
 	public static var safeZoneOffset:Float = (safeFrames / 60) * 1000; // is calculated in create(), is safeFrames in milliseconds
@@ -37,6 +38,7 @@ class Conductor
 		bpmChangeMap = [];
 
 		var curBPM:Int = song.bpm;
+		masterVolume = song.vocalVolume;
 		var totalSteps:Int = 0;
 		var totalPos:Float = 0;
 		for (i in 0...song.notes.length)
@@ -65,5 +67,8 @@ class Conductor
 
 		crochet = ((60 / bpm) * 1000);
 		stepCrochet = crochet / 4;
+		//DD: Try to account for bpm in safezoneoffset, I guess. Not sure if this actually does anything noticeable.
+		safeZoneOffset = (safeFrames / 60) * 1000 + stepCrochet/4;
+
 	}
 }

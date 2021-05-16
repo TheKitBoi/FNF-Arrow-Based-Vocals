@@ -1,7 +1,7 @@
 package;
 
 #if desktop
-import Discord.DiscordClient;
+//import Discord.DiscordClient;
 #end
 import flash.text.TextField;
 import flixel.FlxG;
@@ -52,7 +52,7 @@ class FreeplayState extends MusicBeatState
 
 		#if desktop
 		// Updating Discord Rich Presence
-		DiscordClient.changePresence("In the Menus", null);
+		//DiscordClient.changePresence("In the Menus", null);
 		#end
 
 		var isDebug:Bool = false;
@@ -60,7 +60,7 @@ class FreeplayState extends MusicBeatState
 		#if debug
 		isDebug = true;
 		#end
-		FlxG.log.add('Thing 2');
+
 		if (StoryMenuState.weekUnlocked[2] || isDebug)
 			addWeek(['Bopeebo', 'Fresh', 'Dadbattle'], 1, ['dad']);
 
@@ -178,7 +178,6 @@ class FreeplayState extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
-		FlxG.log.add('Ding 1');
 		super.update(elapsed);
 
 		if (FlxG.sound.music.volume < 0.7)
@@ -258,11 +257,6 @@ class FreeplayState extends MusicBeatState
 
 	function changeSelection(change:Int = 0)
 	{
-		// #if !switch
-		// NGio.logEvent('Fresh');
-		// #end
-
-		// NGio.logEvent('Fresh');
 		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 
 		curSelected += change;
