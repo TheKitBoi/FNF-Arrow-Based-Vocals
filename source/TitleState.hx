@@ -293,7 +293,7 @@ class TitleState extends MusicBeatState
 
 				// var version:String = "v" + Application.current.meta.get('version');
 
-				if (version.trim() != NGio.GAME_VER_NUMS.trim() && !OutdatedSubState.leftState)
+				/*if (version.trim() != NGio.GAME_VER_NUMS.trim() && !OutdatedSubState.leftState)
 				{
 					FlxG.switchState(new OutdatedSubState());
 					trace('OLD VERSION!');
@@ -305,7 +305,8 @@ class TitleState extends MusicBeatState
 				else
 				{
 					FlxG.switchState(new MainMenuState());
-				}
+				}*/
+				FlxG.switchState(new MainMenuState());
 			});
 			// FlxG.sound.play(Paths.music('titleShoot'), 0.7);
 		}

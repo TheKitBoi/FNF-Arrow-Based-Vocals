@@ -115,34 +115,10 @@ class ChartingState extends MusicBeatState
 		leftIcon.setPosition(0, -100);
 		rightIcon.setPosition(gridBG.width / 2, -100);
 
-		// playertapu = new FlxSound().loadEmbedded('assets/sounds/playertapu' + TitleState.soundExt);
-		// FlxG.sound.list.add(playertapu);
-
-		// playertapd = new FlxSound().loadEmbedded('assets/sounds/playertapd' + TitleState.soundExt);
-		// FlxG.sound.list.add(playertapd);
-
-		// playertapl = new FlxSound().loadEmbedded('assets/sounds/playertapl' + TitleState.soundExt);
-		// FlxG.sound.list.add(playertapl);
-
-		// playertapr = new FlxSound().loadEmbedded('assets/sounds/playertapr' + TitleState.soundExt);
-		// FlxG.sound.list.add(playertapr);
-
-		// dadtapu = new FlxSound().loadEmbedded('assets/sounds/playertapu' + TitleState.soundExt);
-		// FlxG.sound.list.add(playertapu);
-
-		// dadtapd = new FlxSound().loadEmbedded('assets/sounds/playertapd' + TitleState.soundExt);
-		// FlxG.sound.list.add(playertapd);
-
-		// dadtapl = new FlxSound().loadEmbedded('assets/sounds/playertapl' + TitleState.soundExt);
-		// FlxG.sound.list.add(playertapl);
-
-		// dadtapr = new FlxSound().loadEmbedded('assets/sounds/playertapr' + TitleState.soundExt);
-		// FlxG.sound.list.add(playertapr);
-
-		FlxG.sound.cache('assets/sounds/playertapu' + TitleState.soundExt);
-		FlxG.sound.cache('assets/sounds/playertapd' + TitleState.soundExt);
-		FlxG.sound.cache('assets/sounds/playertapl' + TitleState.soundExt);
-		FlxG.sound.cache('assets/sounds/playertapr' + TitleState.soundExt);
+		FlxG.sound.cache(Paths.sound('playertapu'));
+		FlxG.sound.cache(Paths.sound('playertapd'));
+		FlxG.sound.cache(Paths.sound('playertapl'));
+		FlxG.sound.cache(Paths.sound('playertapr'));
 
 		var gridBlackLine:FlxSprite = new FlxSprite(gridBG.x + gridBG.width / 2).makeGraphic(2, Std.int(gridBG.height), FlxColor.BLACK);
 		add(gridBlackLine);
@@ -762,26 +738,26 @@ class ChartingState extends MusicBeatState
 						switch (note.noteData)
 						{
 							case 0:
-								FlxG.sound.play("assets/sounds/playertapl" + TitleState.soundExt);
+								FlxG.sound.play(Paths.sound('playertapl'));
 							case 1:
-								FlxG.sound.play("assets/sounds/playertapd" + TitleState.soundExt);
+								FlxG.sound.play(Paths.sound('playertapd'));
 							case 2:
-								FlxG.sound.play("assets/sounds/playertapu" + TitleState.soundExt);
+								FlxG.sound.play(Paths.sound('playertapu'));
 							case 3:
-								FlxG.sound.play("assets/sounds/playertapr" + TitleState.soundExt);
+								FlxG.sound.play(Paths.sound('playertapr'));
 						}
 					}
 					else if (bfDrumPlay && ((_song.notes[curSection].mustHitSection && note.x <= GRID_SIZE * 3) || (!_song.notes[curSection].mustHitSection && note.x > GRID_SIZE * 3))){
 						switch (note.noteData)
 						{
 							case 0:
-								FlxG.sound.play("assets/sounds/playertapl" + TitleState.soundExt);
+								FlxG.sound.play(Paths.sound('playertapl'));
 							case 1:
-								FlxG.sound.play("assets/sounds/playertapd" + TitleState.soundExt);
+								FlxG.sound.play(Paths.sound('playertapd'));
 							case 2:
-								FlxG.sound.play("assets/sounds/playertapu" + TitleState.soundExt);
+								FlxG.sound.play(Paths.sound('playertapu'));
 							case 3:
-								FlxG.sound.play("assets/sounds/playertapr" + TitleState.soundExt);
+								FlxG.sound.play(Paths.sound('playertapr'));
 						}
 					}
 					

@@ -163,31 +163,11 @@ class PlayState extends MusicBeatState
 		Conductor.mapBPMChanges(SONG);
 		Conductor.changeBPM(SONG.bpm);
 
-		//playertapu = FlxG.sound.load('assets/sounds/playertapu' + TitleState.soundExt);
-		//FlxG.sound.list.add(playertapu);
-		//playertapu.volume = 0.5;
-
-		//playertapd = FlxG.sound.load('assets/sounds/playertapd' + TitleState.soundExt);
-		//FlxG.sound.list.add(playertapd);
-		//playertapd.volume = 0.5;
-
-		//playertapl = FlxG.sound.load('assets/sounds/playertapl' + TitleState.soundExt);
-		//FlxG.sound.list.add(playertapl);
-		//playertapl.volume = 0.6;
-
-		//playertapr = FlxG.sound.load('assets/sounds/playertapr' + TitleState.soundExt);
-		//FlxG.sound.list.add(playertapr);
-		//playertapr.volume = 0.6;
-
-		//playertapm = FlxG.sound.load('assets/sounds/playertapm' + TitleState.soundExt);
-		//FlxG.sound.list.add(playertapm);
-		//playertapm.volume = 0.6;
-
-		FlxG.sound.cache('assets/sounds/playertapu' + TitleState.soundExt);
-		FlxG.sound.cache('assets/sounds/playertapd' + TitleState.soundExt);
-		FlxG.sound.cache('assets/sounds/playertapl' + TitleState.soundExt);
-		FlxG.sound.cache('assets/sounds/playertapr' + TitleState.soundExt);
-		FlxG.sound.cache('assets/sounds/playertapm' + TitleState.soundExt);
+		FlxG.sound.cache(Paths.sound('playertapu'));
+		FlxG.sound.cache(Paths.sound('playertapd'));
+		FlxG.sound.cache(Paths.sound('playertapl'));
+		FlxG.sound.cache(Paths.sound('playertapr'));
+		FlxG.sound.cache(Paths.sound('playertapm'));
 
 		switch (SONG.song.toLowerCase())
 		{
@@ -2179,7 +2159,7 @@ class PlayState extends MusicBeatState
 			// FlxG.sound.play(Paths.sound('missnote1'), 1, false);
 			// FlxG.log.add('played imss note');
 			//DD: Miss sound addition for better clarity
-			FlxG.sound.play('assets/sounds/playertapm' + TitleState.soundExt);
+			FlxG.sound.play(Paths.sound('playertapm'));
 			//playertapm.play(true);
 
 			boyfriend.stunned = true;
@@ -2247,13 +2227,13 @@ class PlayState extends MusicBeatState
 				switch (note.noteData)
 				{
 					case 0:
-						FlxG.sound.play("assets/sounds/playertapl" + TitleState.soundExt);
+						FlxG.sound.play(Paths.sound('playertapl'));
 					case 1:
-						FlxG.sound.play("assets/sounds/playertapd" + TitleState.soundExt);
+						FlxG.sound.play(Paths.sound('playertapd'));
 					case 2:
-						FlxG.sound.play("assets/sounds/playertapu" + TitleState.soundExt);
+						FlxG.sound.play(Paths.sound('playertapu'));
 					case 3:
-						FlxG.sound.play("assets/sounds/playertapr" + TitleState.soundExt);
+						FlxG.sound.play(Paths.sound('playertapr'));
 				}
 			}
 
