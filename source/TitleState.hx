@@ -1,5 +1,6 @@
 package;
 
+import flixel.input.gamepad.FlxGamepadAnalogStick;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
@@ -43,6 +44,9 @@ class TitleState extends MusicBeatState
 	var curWacky:Array<String> = [];
 
 	var wackyImage:FlxSprite;
+
+	var titleTextPlaceholder:FlxText;
+	var rgbTime:Float;
 
 	override public function create():Void
 	{
@@ -171,8 +175,8 @@ class TitleState extends MusicBeatState
 		//DD: Too lazy to edit the sprite right now. I'll do it later...maybe.
 		//add(titleText);
 
-		var titleTextPlaceholder = new FlxText(0, FlxG.height * 0.9, 0, "Enterキーを押すとスタートする", 52);
-		titleTextPlaceholder.setFormat("PixelMplus12 Regular", titleTextPlaceholder.size);
+		titleTextPlaceholder = new FlxText(0, FlxG.height * 0.8, 0, "Enterキーを押すとスタートする", 70);
+		titleTextPlaceholder.setFormat("PixelMplus12 Regular", titleTextPlaceholder.size, 0x00ffffff, FlxTextAlign.CENTER, OUTLINE);
 		titleTextPlaceholder.screenCenter(flixel.util.FlxAxes.X);
 		add(titleTextPlaceholder);
 
@@ -307,6 +311,15 @@ class TitleState extends MusicBeatState
 		{
 			skipIntro();
 		}
+
+		rgbTime += FlxG.elapsed;
+		var xval = (180 / Math.PI * curStep) % 360;
+		var red = Std.int(Math.sin(0.1*xval + 0) * 127 + 128);
+		var green = Std.int(Math.sin(0.1*xval + 2) * 127 + 128);
+   		var blue  = Std.int(Math.sin(0.1*xval + 4) * 127 + 128);
+		var daColor = (0xff000000) + (red << 16) + (green << 8) + blue;
+		if (titleTextPlaceholder != null)
+			titleTextPlaceholder.borderColor = daColor;
 
 		super.update(elapsed);
 	}

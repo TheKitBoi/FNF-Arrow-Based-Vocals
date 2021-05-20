@@ -44,12 +44,12 @@ class StoryMenuState extends MusicBeatState
 
 	var weekNames:Array<String> = [
 		"",
-		"ダディ・ディアレスト",
-		"スプーキー・マンス",
-		"ピーコ",
-		"ママ・マスト・マーダー",
+		"パパ・パワー",
+		"怖い月",
+		"ピコ",
+		"ママ魔神",
 		"レッド・スノー",
-		"ヘーティング・シミュレーション（ゲスト： moawling）"
+		"憎悪シミュレーター（ゲスト： moawling）"
 	];
 
 	var txtWeekTitle:FlxText;
@@ -395,7 +395,7 @@ class StoryMenuState extends MusicBeatState
 		grpWeekCharacters.members[0].animation.play(weekCharacters[curWeek][0]);
 		grpWeekCharacters.members[1].animation.play(weekCharacters[curWeek][1]);
 		grpWeekCharacters.members[2].animation.play(weekCharacters[curWeek][2]);
-		txtTracklist.text = "楽曲\n\n";
+		txtTracklist.text = "曲\n\n";
 
 		switch (grpWeekCharacters.members[0].animation.curAnim.name)
 		{
