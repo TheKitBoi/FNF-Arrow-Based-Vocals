@@ -50,6 +50,7 @@ class FreeplayState extends MusicBeatState
 		{
 			songs.push('Spookeez');
 			songs.push('South');
+			songs.push('Monster');
 		}
 
 		if (StoryMenuState.weekUnlocked[3] || isDebug)
@@ -104,10 +105,10 @@ class FreeplayState extends MusicBeatState
 
 		scoreText = new FlxText(FlxG.width * 0.7, 5, 0, "", 32);
 		// scoreText.autoSize = false;
-		scoreText.setFormat("assets/fonts/vcr.ttf", 32, FlxColor.WHITE, RIGHT);
+		scoreText.setFormat("PixelMplus12 Regular", 32, FlxColor.WHITE, RIGHT);
 		// scoreText.alignment = RIGHT;
 
-		var scoreBG:FlxSprite = new FlxSprite(scoreText.x - 6, 0).makeGraphic(Std.int(FlxG.width * 0.35), 66, 0xFF000000);
+		var scoreBG:FlxSprite = new FlxSprite(scoreText.x - 6, 0).makeGraphic(Std.int(FlxG.width * 0.35), 80, 0xFF000000);
 		scoreBG.alpha = 0.6;
 		add(scoreBG);
 
@@ -164,7 +165,7 @@ class FreeplayState extends MusicBeatState
 		if (Math.abs(lerpScore - intendedScore) <= 10)
 			lerpScore = intendedScore;
 
-		scoreText.text = "PERSONAL BEST:" + lerpScore;
+		scoreText.text = "ベストスコア:" + lerpScore;
 
 		var upP = controls.UP_P;
 		var downP = controls.DOWN_P;
@@ -220,21 +221,16 @@ class FreeplayState extends MusicBeatState
 		switch (curDifficulty)
 		{
 			case 0:
-				diffText.text = "EASY";
+				diffText.text = "やさしい";
 			case 1:
-				diffText.text = 'NORMAL';
+				diffText.text = 'ふつう';
 			case 2:
-				diffText.text = "HARD";
+				diffText.text = "むずかしい";
 		}
 	}
 
 	function changeSelection(change:Int = 0)
 	{
-		#if !switch
-		NGio.logEvent('Fresh');
-		#end
-
-		// NGio.logEvent('Fresh');
 		FlxG.sound.play('assets/sounds/scrollMenu' + TitleState.soundExt, 0.4);
 
 		curSelected += change;

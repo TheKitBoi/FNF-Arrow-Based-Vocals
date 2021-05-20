@@ -20,7 +20,9 @@ import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
+#if (!hl)
 import io.newgrounds.NG;
+#end
 import lime.app.Application;
 import openfl.Assets;
 import polymod.Polymod;
@@ -58,7 +60,9 @@ class TitleState extends MusicBeatState
 
 		super.create();
 
+		#if (!hl)
 		NGio.noLogin(APIStuff.API);
+		#end
 
 		#if ng
 		var ng:NGio = new NGio(APIStuff.API, APIStuff.EncKey);
@@ -163,7 +167,14 @@ class TitleState extends MusicBeatState
 		titleText.animation.play('idle');
 		titleText.updateHitbox();
 		// titleText.screenCenter(X);
-		add(titleText);
+
+		//DD: Too lazy to edit the sprite right now. I'll do it later...maybe.
+		//add(titleText);
+
+		var titleTextPlaceholder = new FlxText(0, FlxG.height * 0.9, 0, "Enterキーを押すとスタートする", 52);
+		titleTextPlaceholder.setFormat("PixelMplus12 Regular", titleTextPlaceholder.size);
+		titleTextPlaceholder.screenCenter(flixel.util.FlxAxes.X);
+		add(titleTextPlaceholder);
 
 		var logo:FlxSprite = new FlxSprite().loadGraphic('assets/images/logo.png');
 		logo.screenCenter();
@@ -252,7 +263,7 @@ class TitleState extends MusicBeatState
 
 		if (pressedEnter && !transitioning && skippedIntro)
 		{
-			#if !switch
+			#if (!switch && !hl)
 			NGio.unlockMedal(60960);
 
 			// If it's Friday according to da clock
@@ -272,7 +283,7 @@ class TitleState extends MusicBeatState
 			{
 				// Check if version is outdated
 
-				var version:String = "v" + Application.current.meta.get('version');
+				/*var version:String = "v" + Application.current.meta.get('version');
 
 				if (version.trim() != NGio.GAME_VER_NUMS.trim() && !OutdatedSubState.leftState)
 				{
@@ -286,7 +297,8 @@ class TitleState extends MusicBeatState
 				else
 				{
 					FlxG.switchState(new MainMenuState());
-				}
+				}*/
+				FlxG.switchState(new MainMenuState());
 			});
 			// FlxG.sound.play('assets/music/titleShoot' + TitleState.soundExt, 0.7);
 		}

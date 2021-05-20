@@ -22,7 +22,7 @@ class StoryMenuState extends MusicBeatState
 	var weekData:Array<Dynamic> = [
 		['Tutorial'],
 		['Bopeebo', 'Fresh', 'Dadbattle'],
-		['Spookeez', 'South'],
+		['Spookeez', 'South', 'Monster'],
 		['Pico', 'Philly', "Blammed"],
 		['Satin-Panties', "High", "Milf"],
 		['Cocoa', 'Eggnog', 'Winter-Horrorland'],
@@ -44,12 +44,12 @@ class StoryMenuState extends MusicBeatState
 
 	var weekNames:Array<String> = [
 		"",
-		"Daddy Dearest",
-		"Spooky Month",
-		"PICO",
-		"MOMMY MUST MURDER",
-		"RED SNOW",
-		"hating simulator ft. moawling"
+		"ダディ・ディアレスト",
+		"スプーキー・マンス",
+		"ピーコ",
+		"ママ・マスト・マーダー",
+		"レッド・スノー",
+		"ヘーティング・シミュレーション（ゲスト： moawling）"
 	];
 
 	var txtWeekTitle:FlxText;
@@ -82,15 +82,15 @@ class StoryMenuState extends MusicBeatState
 		persistentUpdate = persistentDraw = true;
 
 		scoreText = new FlxText(10, 10, 0, "SCORE: 49324858", 36);
-		scoreText.setFormat("VCR OSD Mono", 32);
+		scoreText.setFormat("PixelMplus12 Regular", 32);
 
 		txtWeekTitle = new FlxText(FlxG.width * 0.7, 10, 0, "", 32);
-		txtWeekTitle.setFormat("VCR OSD Mono", 32, FlxColor.WHITE, RIGHT);
+		txtWeekTitle.setFormat("PixelMplus12 Regular", 32, FlxColor.WHITE, RIGHT);
 		txtWeekTitle.alpha = 0.7;
 
 		var rankText:FlxText = new FlxText(0, 10);
 		rankText.text = 'RANK: GREAT';
-		rankText.setFormat("assets/fonts/vcr.ttf", 32);
+		rankText.setFormat("PixelMplus12 Regular", 32);
 		rankText.size = scoreText.size;
 		rankText.screenCenter(X);
 
@@ -219,7 +219,7 @@ class StoryMenuState extends MusicBeatState
 		// scoreText.setFormat('VCR OSD Mono', 32);
 		lerpScore = Math.floor(FlxMath.lerp(lerpScore, intendedScore, 0.5));
 
-		scoreText.text = "WEEK SCORE:" + lerpScore;
+		scoreText.text = "週のベストスコア:" + lerpScore;
 
 		txtWeekTitle.text = weekNames[curWeek].toUpperCase();
 		txtWeekTitle.x = FlxG.width - (txtWeekTitle.width + 10);
@@ -395,7 +395,7 @@ class StoryMenuState extends MusicBeatState
 		grpWeekCharacters.members[0].animation.play(weekCharacters[curWeek][0]);
 		grpWeekCharacters.members[1].animation.play(weekCharacters[curWeek][1]);
 		grpWeekCharacters.members[2].animation.play(weekCharacters[curWeek][2]);
-		txtTracklist.text = "Tracks\n";
+		txtTracklist.text = "楽曲\n\n";
 
 		switch (grpWeekCharacters.members[0].animation.curAnim.name)
 		{
@@ -425,7 +425,7 @@ class StoryMenuState extends MusicBeatState
 
 		for (i in stringThing)
 		{
-			txtTracklist.text += "\n" + i;
+			txtTracklist.text += i + "\n";
 		}
 
 		txtTracklist.text = txtTracklist.text.toUpperCase();

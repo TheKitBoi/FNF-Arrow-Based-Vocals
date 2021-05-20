@@ -674,7 +674,7 @@ class PlayState extends MusicBeatState
 		add(healthBar);
 
 		scoreTxt = new FlxText(healthBarBG.x + healthBarBG.width - 190, healthBarBG.y + 30, 0, "", 20);
-		scoreTxt.setFormat("assets/fonts/vcr.ttf", 16, FlxColor.WHITE, RIGHT);
+		scoreTxt.setFormat("assets/fonts/pixelmplus12.ttf", 16, FlxColor.WHITE, RIGHT);
 		scoreTxt.scrollFactor.set();
 		add(scoreTxt);
 
@@ -1264,7 +1264,7 @@ class PlayState extends MusicBeatState
 
 		super.update(elapsed);
 
-		scoreTxt.text = "Score:" + songScore;
+		scoreTxt.text = "スコア:　" + songScore;
 
 		if (FlxG.keys.justPressed.ENTER && startedCountdown && canPause)
 		{
@@ -1620,7 +1620,9 @@ class PlayState extends MusicBeatState
 
 				if (SONG.validScore)
 				{
+					#if (!switch && !hl)
 					NGio.unlockMedal(60961);
+					#end
 					Highscore.saveWeekScore(storyWeek, campaignScore, storyDifficulty);
 				}
 
@@ -1845,132 +1847,80 @@ class PlayState extends MusicBeatState
 		var controlArray:Array<Bool> = [leftP, downP, upP, rightP];
 
 		// FlxG.watch.addQuick('asdfa', upP);
-		if ((upP || rightP || downP || leftP) && !boyfriend.stunned && generatedMusic)
+		// DD: Rework inputs to tone down the jank. These changes may get nuked when week 7 source is public.
+		var possibleNotes:Array<Note> = [];
+		// var ignoreList:Array<Int> = [];
+
+		notes.forEachAlive(function(daNote:Note)
 		{
-			boyfriend.holdTimer = 0;
-
-			var possibleNotes:Array<Note> = [];
-
-			var ignoreList:Array<Int> = [];
-
-			notes.forEachAlive(function(daNote:Note)
+			if (daNote.canBeHit && daNote.mustPress && !daNote.tooLate && !daNote.wasGoodHit)
 			{
-				if (daNote.canBeHit && daNote.mustPress && !daNote.tooLate && !daNote.wasGoodHit)
-				{
-					// the sorting probably doesn't need to be in here? who cares lol
-					possibleNotes.push(daNote);
-					possibleNotes.sort((a, b) -> Std.int(a.strumTime - b.strumTime));
-
-					ignoreList.push(daNote.noteData);
-				}
-			});
-
-			if (possibleNotes.length > 0)
-			{
-				var daNote = possibleNotes[0];
-
-				if (perfectMode)
-					noteCheck(true, daNote);
-
-				// Jump notes
-				if (possibleNotes.length >= 2)
-				{
-					if (possibleNotes[0].strumTime == possibleNotes[1].strumTime)
-					{
-						for (coolNote in possibleNotes)
-						{
-							if (controlArray[coolNote.noteData])
-								goodNoteHit(coolNote);
-							else
-							{
-								var inIgnoreList:Bool = false;
-								for (shit in 0...ignoreList.length)
-								{
-									if (controlArray[ignoreList[shit]])
-										inIgnoreList = true;
-								}
-								if (!inIgnoreList)
-									badNoteCheck();
-							}
-						}
-					}
-					else if (possibleNotes[0].noteData == possibleNotes[1].noteData)
-					{
-						noteCheck(controlArray[daNote.noteData], daNote);
-					}
-					else
-					{
-						for (coolNote in possibleNotes)
-						{
-							noteCheck(controlArray[coolNote.noteData], coolNote);
-						}
-					}
-				}
-				else // regular notes?
-				{
-					noteCheck(controlArray[daNote.noteData], daNote);
-				}
-				/* 
-					if (controlArray[daNote.noteData])
-						goodNoteHit(daNote);
-				 */
-				// trace(daNote.noteData);
-				/* 
-					switch (daNote.noteData)
-					{
-						case 2: // NOTES YOU JUST PRESSED
-							if (upP || rightP || downP || leftP)
-								noteCheck(upP, daNote);
-						case 3:
-							if (upP || rightP || downP || leftP)
-								noteCheck(rightP, daNote);
-						case 1:
-							if (upP || rightP || downP || leftP)
-								noteCheck(downP, daNote);
-						case 0:
-							if (upP || rightP || downP || leftP)
-								noteCheck(leftP, daNote);
-					}
-				
-				//this is already done in noteCheck / goodNoteHit
-				if (daNote.wasGoodHit)
-				{
-					daNote.kill();
-					notes.remove(daNote, true);
-					daNote.destroy();
-				}
-				 */
+				// the sorting probably doesn't need to be in here? who cares lol
+				possibleNotes.push(daNote);
+				// possibleNotes.sort((a, b) -> Std.int(a.strumTime - b.strumTime));
+				haxe.ds.ArraySort.sort(possibleNotes, (a, b) -> Std.int(a.strumTime - b.strumTime));
+				// ignoreList.push(daNote.noteData);
 			}
-			else
+		});
+
+		for (checkThisChucklenuts in [upP, rightP, downP, leftP])
+		{
+			if (checkThisChucklenuts /*&& !boyfriend.stunned*/ && generatedMusic)
 			{
-				badNoteCheck();
+				boyfriend.holdTimer = 0;
+				if (possibleNotes.length > 0)
+				{
+					// var daNote = possibleNotes[0];
+					var goodEnough:Bool = false;
+					var goodEnoughIndex:Array<Int> = [];
+					for (i in 0...possibleNotes.length)
+					{
+						if (controlArray[possibleNotes[i].noteData])
+						{
+							goodEnough = true;
+							goodEnoughIndex.push(i);
+							noteCheck(goodEnough, possibleNotes[i]);
+						}
+					}
+					for (i in goodEnoughIndex)
+					{
+						possibleNotes.remove(possibleNotes[i]);
+					}
+				}
+				else
+				{
+					badNoteCheck();
+				}
 			}
 		}
 
-		if ((up || right || down || left) && !boyfriend.stunned && generatedMusic)
+		for (checkThisChucklenuts in [up, right, down, left])
 		{
-			notes.forEachAlive(function(daNote:Note)
+			if (checkThisChucklenuts /*&& !boyfriend.stunned*/ && generatedMusic)
 			{
-				if (daNote.canBeHit && daNote.mustPress && daNote.isSustainNote)
+				notes.forEachAlive(function(daNote:Note)
 				{
-					switch (daNote.noteData)
+					if (daNote.canBeHit && daNote.mustPress && daNote.isSustainNote)
 					{
-						// NOTES YOU ARE HOLDING
-						case 0:
-							if (left)
-								goodNoteHit(daNote);
-						case 1:
-							if (down)
-								goodNoteHit(daNote);
-						case 2:
-							if (up)
-								goodNoteHit(daNote);
-						case 3:
-							if (right)
-								goodNoteHit(daNote);
+						switch (daNote.noteData)
+						{
+							// NOTES YOU ARE HOLDING
+							case 0:
+								if (left)
+									goodNoteHit(daNote);
+							case 1:
+								if (down)
+									goodNoteHit(daNote);
+							case 2:
+								if (up)
+									goodNoteHit(daNote);
+							case 3:
+								if (right)
+									goodNoteHit(daNote);
+						}
 					}
-				}
-			});
+				});
+			}
 		}
 
 		if (boyfriend.holdTimer > Conductor.stepCrochet * 4 * 0.001 && !up && !down && !right && !left)

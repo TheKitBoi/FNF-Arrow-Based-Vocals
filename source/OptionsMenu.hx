@@ -93,7 +93,7 @@ class OptionsMenu extends MusicBeatState
 
 	function changeSelection(change:Int = 0)
 	{
-		#if !switch
+		#if (!switch && !hl)
 		NGio.logEvent('Fresh');
 		#end
 

@@ -1,5 +1,9 @@
 package;
 
+import flixel.math.FlxMath;
+import flixel.math.FlxVelocity;
+import flixel.addons.effects.chainable.FlxOutlineEffect;
+import flixel.text.FlxText;
 import Controls.Control;
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -11,11 +15,16 @@ import flixel.system.FlxSound;
 import flixel.util.FlxColor;
 
 class PauseSubState extends MusicBeatSubstate
-{
-	var grpMenuShit:FlxTypedGroup<Alphabet>;
+{	
+	//DD: OG game uses Alphabet class, which only supports English.
+	//Gonna have to use FlxText instead.
+	var grpMenuShit:FlxTypedGroup<FlxText>;
 
-	var menuItems:Array<String> = ['Resume', 'Restart Song', 'Exit to menu'];
+	var menuItems:Array<String> = ['ゲーム再開', '再び起動', 'メニューに戻る'];
 	var curSelected:Int = 0;
+
+	var gapSizeY:Float = 120;
+	var gapSizeX:Float = 20;
 
 	var pauseMusic:FlxSound;
 
@@ -34,14 +43,17 @@ class PauseSubState extends MusicBeatSubstate
 		bg.scrollFactor.set();
 		add(bg);
 
-		grpMenuShit = new FlxTypedGroup<Alphabet>();
+		grpMenuShit = new FlxTypedGroup<FlxText>();
 		add(grpMenuShit);
 
 		for (i in 0...menuItems.length)
 		{
-			var songText:Alphabet = new Alphabet(0, (70 * i) + 30, menuItems[i], true, false);
-			songText.isMenuItem = true;
-			songText.targetY = i;
+			// var songText:Alphabet = new Alphabet(0, (70 * i) + 30, menuItems[i], true, false);
+			// songText.isMenuItem = true;
+			var songText:FlxText = new FlxText(gapSizeX * i + 100, (gapSizeY * i) + FlxG.height / 2, 0, menuItems[i], 80);
+			songText.setFormat("assets/fonts/killgothic.ttf", songText.size, FlxColor.WHITE, LEFT, SHADOW, FlxColor.BLACK);
+			songText.borderSize = 12;
+			songText.borderQuality = 1;
 			grpMenuShit.add(songText);
 		}
 
@@ -76,11 +88,11 @@ class PauseSubState extends MusicBeatSubstate
 
 			switch (daSelected)
 			{
-				case "Resume":
+				case "ゲーム再開":
 					close();
-				case "Restart Song":
+				case "再び起動":
 					FlxG.resetState();
-				case "Exit to menu":
+				case "メニューに戻る":
 					FlxG.switchState(new MainMenuState());
 			}
 		}
@@ -89,6 +101,17 @@ class PauseSubState extends MusicBeatSubstate
 		{
 			// for reference later!
 			// PlayerSettings.player1.controls.replaceBinding(Control.LEFT, Keys, FlxKey.J, null);
+		}
+
+		for (i in 0...grpMenuShit.members.length)
+		{
+			var targetY = (gapSizeY * i) + FlxG.height / 2 - gapSizeY * curSelected;
+			var targetX = gapSizeX * i + 100 - gapSizeX * curSelected;
+			if (grpMenuShit.members[i].y != targetY)
+			{
+				grpMenuShit.members[i].y = FlxMath.lerp(grpMenuShit.members[i].y, targetY, 0.16);
+				grpMenuShit.members[i].x = FlxMath.lerp(grpMenuShit.members[i].x, targetX, 0.16);
+			}
 		}
 	}
 
@@ -108,19 +131,19 @@ class PauseSubState extends MusicBeatSubstate
 		if (curSelected >= menuItems.length)
 			curSelected = 0;
 
-		var bullShit:Int = 0;
+		// var bullShit:Int = 0;
 
-		for (item in grpMenuShit.members)
+		for (i in 0...grpMenuShit.members.length)
 		{
-			item.targetY = bullShit - curSelected;
-			bullShit++;
+			// item.targetY = bullShit - curSelected;
+			// bullShit++;
 
-			item.alpha = 0.6;
+			grpMenuShit.members[i].alpha = 0.6;
 			// item.setGraphicSize(Std.int(item.width * 0.8));
 
-			if (item.targetY == 0)
+			if (i == curSelected)
 			{
-				item.alpha = 1;
+				grpMenuShit.members[i].alpha = 1;
 				// item.setGraphicSize(Std.int(item.width));
 			}
 		}

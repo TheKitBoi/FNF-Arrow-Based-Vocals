@@ -1,3 +1,3 @@
-:dad:Ah, a new fair maiden has come in search of true love!
-:dad:A serenade between gentlemen shall decide where her beautiful heart shall reside.
-:bf:Beep bo bop
+:dad:ああ、また綺麗な乙女が真実の愛を求める為に来たそう。
+:dad:彼女の美しい心は紳士たちのセレナーデ次第だね。
+:bf:ビープ・ボ・ボップ。
