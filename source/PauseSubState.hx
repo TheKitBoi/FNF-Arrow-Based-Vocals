@@ -51,7 +51,7 @@ class PauseSubState extends MusicBeatSubstate
 			// var songText:Alphabet = new Alphabet(0, (70 * i) + 30, menuItems[i], true, false);
 			// songText.isMenuItem = true;
 			var songText:FlxText = new FlxText(gapSizeX * i + 100, (gapSizeY * i) + FlxG.height / 2, 0, menuItems[i], 80);
-			songText.setFormat("assets/fonts/deltagothic.ttf", songText.size, FlxColor.WHITE, LEFT, SHADOW, FlxColor.BLACK);
+			songText.setFormat("assets/fonts/yuseimagic.ttf", songText.size, FlxColor.WHITE, LEFT, SHADOW, FlxColor.BLACK);
 			songText.borderSize = 12;
 			songText.borderQuality = 1;
 			grpMenuShit.add(songText);

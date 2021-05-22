@@ -1877,9 +1877,13 @@ class PlayState extends MusicBeatState
 					{
 						if (controlArray[possibleNotes[i].noteData])
 						{
-							goodEnough = true;
-							goodEnoughIndex.push(i);
-							noteCheck(goodEnough, possibleNotes[i]);
+							if (!goodEnough || (goodEnough && possibleNotes[i].strumTime == possibleNotes[goodEnoughIndex[0]].strumTime))
+							{
+								goodEnoughIndex.push(i);
+								noteCheck(true, possibleNotes[i]);
+								goodEnough = true;
+							}
+							
 						}
 					}
 					for (i in goodEnoughIndex)

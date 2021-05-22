@@ -46,7 +46,6 @@ class TitleState extends MusicBeatState
 	var wackyImage:FlxSprite;
 
 	var titleTextPlaceholder:FlxText;
-	var rgbTime:Float;
 
 	override public function create():Void
 	{
@@ -173,6 +172,7 @@ class TitleState extends MusicBeatState
 		// titleText.screenCenter(X);
 
 		//DD: Too lazy to edit the sprite right now. I'll do it later...maybe.
+		//Actually, I'm just gonna keep it like this. It's easier than editing the individual frames of the sprite.
 		//add(titleText);
 
 		titleTextPlaceholder = new FlxText(0, FlxG.height * 0.8, 0, "Enterキーを押すとスタートする", 70);
@@ -312,7 +312,6 @@ class TitleState extends MusicBeatState
 			skipIntro();
 		}
 
-		rgbTime += FlxG.elapsed;
 		var xval = (180 / Math.PI * curStep) % 360;
 		var red = Std.int(Math.sin(0.1*xval + 0) * 127 + 128);
 		var green = Std.int(Math.sin(0.1*xval + 2) * 127 + 128);
