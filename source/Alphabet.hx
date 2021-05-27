@@ -1,5 +1,7 @@
 package;
 
+import flixel.util.FlxColor;
+import flixel.text.FlxText;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.graphics.frames.FlxAtlasFrames;
@@ -52,7 +54,8 @@ class Alphabet extends FlxSpriteGroup
 		{
 			if (typed)
 			{
-				startTypedText();
+				//startTypedText();
+				addText();
 			}
 			else
 			{
@@ -76,8 +79,8 @@ class Alphabet extends FlxSpriteGroup
 			{
 				lastWasSpace = true;
 			}
-
-			if (AlphaCharacter.alphabet.indexOf(character.toLowerCase()) != -1)
+			if (true)
+				//if (AlphaCharacter.alphabet.indexOf(character.toLowerCase()) != -1)
 				// if (AlphaCharacter.alphabet.contains(character.toLowerCase()))
 			{
 				if (lastSprite != null)
@@ -87,7 +90,7 @@ class Alphabet extends FlxSpriteGroup
 
 				if (lastWasSpace)
 				{
-					xPos += 40;
+					//xPos += 40;
 					lastWasSpace = false;
 				}
 
@@ -95,7 +98,10 @@ class Alphabet extends FlxSpriteGroup
 				var letter:AlphaCharacter = new AlphaCharacter(xPos, 0);
 
 				if (isBold)
-					letter.createBold(character);
+				{
+					//letter.createBold(character);
+					letter.createLetter(character);
+				}
 				else
 				{
 					letter.createLetter(character);
@@ -159,7 +165,7 @@ class Alphabet extends FlxSpriteGroup
 			{
 				if (lastSprite != null && !xPosResetted)
 				{
-					lastSprite.updateHitbox();
+					//lastSprite.updateHitbox();
 					xPos += lastSprite.width + 3;
 					// if (isBold)
 					// xPos -= 80;
@@ -232,7 +238,7 @@ class Alphabet extends FlxSpriteGroup
 	}
 }
 
-class AlphaCharacter extends FlxSprite
+class AlphaCharacter extends FlxText
 {
 	public static var alphabet:String = "abcdefghijklmnopqrstuvwxyz";
 
@@ -244,31 +250,35 @@ class AlphaCharacter extends FlxSprite
 
 	public function new(x:Float, y:Float)
 	{
-		super(x, y);
-		var tex = FlxAtlasFrames.fromSparrow('assets/images/alphabet.png', 'assets/images/alphabet.xml');
-		frames = tex;
+		super(x, y, 0, "", 60);
+		//var tex = FlxAtlasFrames.fromSparrow('assets/images/alphabet.png', 'assets/images/alphabet.xml');
+		//frames = tex;
+		setFormat("assets/fonts/yuseimagic.ttf", 60, FlxColor.WHITE, FlxTextAlign.CENTER, OUTLINE, FlxColor.BLACK);
+		setBorderStyle(OUTLINE, FlxColor.BLACK, 5);
 
 		antialiasing = true;
 	}
 
 	public function createBold(letter:String)
 	{
-		animation.addByPrefix(letter, letter.toUpperCase() + " bold", 24);
-		animation.play(letter);
-		updateHitbox();
+		//animation.addByPrefix(letter, letter.toUpperCase() + " bold", 24);
+		//animation.play(letter);
+		//updateHitbox();
 	}
 
 	public function createLetter(letter:String):Void
 	{
-		var letterCase:String = "lowercase";
-		if (letter.toLowerCase() != letter)
-		{
-			letterCase = 'capital';
-		}
+		// var letterCase:String = "lowercase";
+		// if (letter.toLowerCase() != letter)
+		// {
+		// 	letterCase = 'capital';
+		// }
 
-		animation.addByPrefix(letter, letter + " " + letterCase, 24);
-		animation.play(letter);
-		updateHitbox();
+		// animation.addByPrefix(letter, letter + " " + letterCase, 24);
+		// animation.play(letter);
+		
+		this.text = letter.toUpperCase();
+		//updateHitbox();
 
 		FlxG.log.add('the row' + row);
 
@@ -278,32 +288,37 @@ class AlphaCharacter extends FlxSprite
 
 	public function createNumber(letter:String):Void
 	{
-		animation.addByPrefix(letter, letter, 24);
-		animation.play(letter);
+		// animation.addByPrefix(letter, letter, 24);
+		// animation.play(letter);
 
-		updateHitbox();
+		this.text = letter;
+		//updateHitbox();
 	}
 
 	public function createSymbol(letter:String)
 	{
-		switch (letter)
-		{
-			case '.':
-				animation.addByPrefix(letter, 'period', 24);
-				animation.play(letter);
-				y += 50;
-			case "'":
-				animation.addByPrefix(letter, 'apostraphie', 24);
-				animation.play(letter);
-				y -= 0;
-			case "?":
-				animation.addByPrefix(letter, 'question mark', 24);
-				animation.play(letter);
-			case "!":
-				animation.addByPrefix(letter, 'exclamation point', 24);
-				animation.play(letter);
-		}
+		// switch (letter)
+		// {
+		// 	case '.':
+		// 		animation.addByPrefix(letter, 'period', 24);
+		// 		animation.play(letter);
+		// 		y += 50;
+		// 	case "'":
+		// 		animation.addByPrefix(letter, 'apostraphie', 24);
+		// 		animation.play(letter);
+		// 		y -= 0;
+		// 	case "?":
+		// 		animation.addByPrefix(letter, 'question mark', 24);
+		// 		animation.play(letter);
+		// 	case "!":
+		// 		animation.addByPrefix(letter, 'exclamation point', 24);
+		// 		animation.play(letter);
+		// }
 
-		updateHitbox();
+		this.text = letter;
+		if (letter == '.')
+			y += 50;
+
+		//updateHitbox();
 	}
 }
