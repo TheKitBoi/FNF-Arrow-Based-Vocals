@@ -1,9 +1,12 @@
 package;
 
 #if desktop
-import Discord.DiscordClient;
 import sys.thread.Thread;
+#if (!hl)
+import Discord.DiscordClient;
 #end
+#end
+
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
@@ -24,7 +27,9 @@ import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
+#if (!hl)
 import io.newgrounds.NG;
+#end
 import lime.app.Application;
 import openfl.Assets;
 
@@ -58,9 +63,11 @@ class TitleState extends MusicBeatState
 
 		super.create();
 
+		#if (!hl)
 		NGio.noLogin(APIStuff.API);
+		#end
 
-		#if ng
+		#if (!hl && ng)
 		var ng:NGio = new NGio(APIStuff.API, APIStuff.EncKey);
 		trace('NEWGROUNDS LOL');
 		#end
@@ -94,7 +101,7 @@ class TitleState extends MusicBeatState
 		});
 		#end
 
-		#if desktop
+		#if (desktop && !hl)
 		DiscordClient.initialize();
 		
 		Application.current.onExit.add (function (exitCode) {
@@ -270,7 +277,7 @@ class TitleState extends MusicBeatState
 
 		if (pressedEnter && !transitioning && skippedIntro)
 		{
-			#if !switch
+			#if (!switch && !hl)
 			NGio.unlockMedal(60960);
 
 			// If it's Friday according to da clock
