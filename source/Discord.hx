@@ -1,4 +1,4 @@
-#if (!hl)
+#if (desktop && !hl)
 package;
 
 import Sys.sleep;
