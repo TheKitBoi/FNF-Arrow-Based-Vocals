@@ -6,7 +6,6 @@ import Song.SwagSong;
  * ...
  * @author
  */
-
 typedef BPMChangeEvent =
 {
 	var stepTime:Int;
@@ -43,7 +42,7 @@ class Conductor
 		var totalPos:Float = 0;
 		for (i in 0...song.notes.length)
 		{
-			if(song.notes[i].changeBPM && song.notes[i].bpm != curBPM)
+			if (song.notes[i].changeBPM && song.notes[i].bpm != curBPM)
 			{
 				curBPM = song.notes[i].bpm;
 				var event:BPMChangeEvent = {
@@ -67,8 +66,7 @@ class Conductor
 
 		crochet = ((60 / bpm) * 1000);
 		stepCrochet = crochet / 4;
-		//DD: Try to account for bpm in safezoneoffset, I guess. Not sure if this actually does anything noticeable.
-		safeZoneOffset = (safeFrames / 60) * 1000 + stepCrochet/4;
-
+		// DD: Try to account for bpm in safezoneoffset, I guess. Not sure if this actually does anything noticeable.
+		safeZoneOffset = (safeFrames / 60) * 1000 + stepCrochet / 4;
 	}
 }

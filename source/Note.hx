@@ -14,11 +14,11 @@ class Note extends FlxSprite
 {
 	public var strumTime:Float = 0;
 
-	//DD: Note pitch
+	// DD: Note pitch and other stuff
 	public var notePitch:Float = 1.0;
-	//public var isLastSustain:Bool = false;
 	public var noteSyllable:Int = -1;
 	public var holdID:Int = 0;
+	public var noteVolume:Float = 1.0;
 
 	public var mustPress:Bool = false;
 	public var noteData:Int = 0;
@@ -137,16 +137,12 @@ class Note extends FlxSprite
 			{
 				case 2:
 					animation.play('greenholdend');
-					//isLastSustain = true;
 				case 3:
 					animation.play('redholdend');
-					//isLastSustain = true;
 				case 1:
 					animation.play('blueholdend');
-					//isLastSustain = true;
 				case 0:
 					animation.play('purpleholdend');
-					//isLastSustain = true;
 			}
 
 			updateHitbox();
@@ -162,16 +158,12 @@ class Note extends FlxSprite
 				{
 					case 0:
 						prevNote.animation.play('purplehold');
-						//prevNote.isLastSustain = false;
 					case 1:
 						prevNote.animation.play('bluehold');
-						//prevNote.isLastSustain = false;
 					case 2:
 						prevNote.animation.play('greenhold');
-						//prevNote.isLastSustain = false;
 					case 3:
 						prevNote.animation.play('redhold');
-						//prevNote.isLastSustain = false;
 				}
 
 				prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.5 * PlayState.SONG.speed;
