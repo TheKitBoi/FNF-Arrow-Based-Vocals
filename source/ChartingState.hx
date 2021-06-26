@@ -1,5 +1,6 @@
 package;
 
+import openfl.display.Stage;
 import haxe.Constraints.NotVoid;
 import flixel.addons.ui.FlxUIButton;
 import flixel.FlxState;
@@ -124,6 +125,9 @@ class ChartingState extends MusicBeatState
 
 	override function create()
 	{
+
+		Conductor.playbackSpeed = 1.0;
+
 		curSection = lastSection;
 
 		gridBG = FlxGridOverlay.create(GRID_SIZE, GRID_SIZE, GRID_SIZE * 8, GRID_SIZE * 16);
@@ -183,7 +187,7 @@ class ChartingState extends MusicBeatState
 		allSyllableSounds = [dada, dadi, dadu, dade, dado, bfa, bfi, bfu, bfe, bfo];
 
 		FlxG.mouse.visible = true;
-		FlxG.save.bind('funkin', 'ninjamuffin99');
+		FlxG.save.bind('funkinarrowvocals');
 
 		tempBpm = _song.bpm;
 

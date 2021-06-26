@@ -44,6 +44,9 @@ class TitleState extends MusicBeatState
 
 	var wackyImage:FlxSprite;
 
+	static public var arrowVocals:Bool = true;
+	static public var pitchShift:Bool = false;
+
 	override public function create():Void
 	{
 		#if polymod
@@ -65,7 +68,7 @@ class TitleState extends MusicBeatState
 		//trace('NEWGROUNDS LOL');
 		#end
 
-		FlxG.save.bind('funkin', 'ninjamuffin99');
+		FlxG.save.bind('funkinarrowvocals');
 
 		Highscore.load();
 
@@ -101,6 +104,11 @@ class TitleState extends MusicBeatState
 			DiscordClient.shutdown();
 		 });*/
 		#end
+
+		if (FlxG.save.data.pitchShift != null)
+			pitchShift = FlxG.save.data.pitchShift;
+		if (FlxG.save.data.arrowVocals != null)
+			arrowVocals = FlxG.save.data.arrowVocals;
 	}
 
 	var logoBl:FlxSprite;

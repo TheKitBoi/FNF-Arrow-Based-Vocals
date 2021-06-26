@@ -1,5 +1,6 @@
 package;
 
+import lime.media.openal.ALFilter;
 import flixel.FlxG;
 import flixel.FlxGame;
 import flixel.FlxBasic;
@@ -23,6 +24,9 @@ class AudioThing extends FlxBasic
 	var _volume:Float = 1.0;
 	var audioSource = AL.createSource();
 	var audioBuffer = AL.createBuffer();
+	var audioAux = AL.createAux();
+	var audioEffect = AL.createEffect();
+	var audioFilter = AL.createFilter();
 	#else
 	var elseSound:FlxSound;
 	#end
@@ -51,7 +55,7 @@ class AudioThing extends FlxBasic
 		}
 		else
 			return;
-		var sndData = readVorbisFileBuffer(vorb);
+		var sndData = SyllableSound.readVorbisFileBuffer(vorb);
 		var vorbInfo:VorbisInfo = vorb.info();
 		var vorbChannels = AL.FORMAT_STEREO16;
 		if (vorbInfo.channels <= 1)
@@ -60,6 +64,27 @@ class AudioThing extends FlxBasic
 		_length = vorb.timeTotal() * 1000;
 		AL.bufferData(audioBuffer, vorbChannels, sndData, sndData.length, vorbRate);
 		AL.sourcei(audioSource, AL.BUFFER, audioBuffer);
+		
+		if (TitleState.pitchShift && Conductor.playbackSpeed != 1.0)
+		{
+			#if (!hl)
+			//DD: wtf why doesn't this work on hl?
+			var rawPitchShiftOffset:Float = -(12*Math.log(Conductor.playbackSpeed) / Math.log(2));
+			var newSemitone:Int = Math.floor(rawPitchShiftOffset);
+			var newCents:Int = Std.int(Math.min(Math.floor((rawPitchShiftOffset - newSemitone) * 100), 50));
+			AL.sourcei(audioSource, AL.AUXILIARY_SEND_FILTER_GAIN_AUTO, 1);
+			AL.sourcei(audioSource, AL.AUXILIARY_SEND_FILTER_GAINHF_AUTO, 1);
+			AL.effecti(audioEffect, AL.EFFECT_TYPE, AL.EFFECT_PITCH_SHIFTER);
+			AL.effecti(audioEffect, AL.PITCH_SHIFTER_COARSE_TUNE, newSemitone);
+			AL.effecti(audioEffect, AL.PITCH_SHIFTER_FINE_TUNE, newCents);
+			AL.auxi(audioAux, AL.EFFECTSLOT_EFFECT, audioEffect);
+			AL.source3i(audioSource, AL.AUXILIARY_SEND_FILTER, audioAux, 0, 0);
+			AL.filteri(audioFilter, AL.FILTER_TYPE, AL.FILTER_LOWPASS);
+			AL.filterf(audioFilter, AL.LOWPASS_GAIN, 0);
+			AL.filterf(audioFilter, AL.LOWPASS_GAINHF, 0);
+			AL.sourcei(audioSource, AL.DIRECT_FILTER, audioFilter);
+			#end
+		}
 		#else
 		elseSound = new FlxSound().loadEmbedded(filePath);
 		#end
@@ -77,7 +102,12 @@ class AudioThing extends FlxBasic
 	{
 		#if desktop
 		if (audioSource != null)
-			AL.sourcef(audioSource, AL.GAIN, _volume * FlxG.sound.volume);
+		{
+			if (FlxG.sound.muted)
+				AL.sourcef(audioSource, AL.GAIN, 0);
+			else
+				AL.sourcef(audioSource, AL.GAIN, _volume * FlxG.sound.volume);
+		}
 		#end
 		super.update(elapsed);
 	}
@@ -216,7 +246,10 @@ class AudioThing extends FlxBasic
 	{
 		#if desktop
 		if (audioSource != null)
+		{
 			AL.sourcef(audioSource, AL.PITCH, newSpeed);
+			
+		}
 		return newSpeed;
 		#end
 		return 1.0;
@@ -238,40 +271,4 @@ class AudioThing extends FlxBasic
 		_lostFocus = false;
 		play();
 	}
-
-	#if (desktop)
-	// DD: Just gonna take this from my other mod.
-	function readVorbisFileBuffer(vorbisFile:VorbisFile):UInt8Array
-	{
-		var length = Std.int(vorbisFile.bitrate() * vorbisFile.timeTotal() * vorbisFile.info().rate/10000);
-		var buffer = Bytes.alloc(length);
-		var read = 0, total = 0, readMax;
-
-		while (total < length)
-		{
-			readMax = 4096;
-
-			if (readMax > length - total)
-			{
-				readMax = length - total;
-			}
-
-			read = vorbisFile.read(buffer, total, readMax);
-
-			if (read > 0)
-			{
-				total += read;
-			}
-			else
-			{
-				break;
-			}
-		}
-
-		var realbuffer = new UInt8Array(total);
-		realbuffer.buffer.blit(0, buffer, 0, total);
-
-		return realbuffer;
-	}
-	#end
 }

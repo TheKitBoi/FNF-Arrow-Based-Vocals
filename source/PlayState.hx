@@ -66,6 +66,10 @@ class PlayState extends MusicBeatState
 
 	var allSyllableSounds:Array<SyllableSound>;
 
+	//DD: Using custom class for music/vocals for speed change
+	private var musicThing: AudioThing;
+	private var vocalThing: AudioThing;
+
 	public static var curStage:String = '';
 	public static var SONG:SwagSong;
 	public static var isStoryMode:Bool = false;
@@ -75,7 +79,7 @@ class PlayState extends MusicBeatState
 
 	var halloweenLevel:Bool = false;
 
-	private var vocals:FlxSound;
+	//private var vocals:FlxSound;
 
 	private var dad:Character;
 	private var gf:Character;
@@ -186,6 +190,20 @@ class PlayState extends MusicBeatState
 		Conductor.changeBPM(SONG.bpm);
 
 		allSyllableSounds = [dada, dadi, dadu, dade, dado, bfa, bfi, bfu, bfe, bfo];
+
+		//DD: Using custom class for music/vocals here for speed changing.
+		var musicString = "assets/songs/" + PlayState.SONG.song.toLowerCase() + "/Inst." + Paths.SOUND_EXT;
+		musicThing = new AudioThing(musicString);
+		add(musicThing);
+
+		if (SONG.needsVoices || !TitleState.arrowVocals)
+		{
+			var vocalString = "assets/songs/" + PlayState.SONG.song.toLowerCase() + "/Voices." + Paths.SOUND_EXT;
+			vocalThing = new AudioThing(vocalString);
+			add(vocalThing);
+		}
+		else
+			vocalThing = new AudioThing("");
 
 		switch (SONG.song.toLowerCase())
 		{
@@ -947,7 +965,7 @@ class PlayState extends MusicBeatState
 
 		var swagCounter:Int = 0;
 
-		startTimer = new FlxTimer().start(Conductor.crochet / 1000, function(tmr:FlxTimer)
+		startTimer = new FlxTimer().start(Conductor.crochet / 1000 * (1/Conductor.playbackSpeed), function(tmr:FlxTimer)
 		{
 			dad.dance();
 			gf.dance();
@@ -1049,13 +1067,26 @@ class PlayState extends MusicBeatState
 		lastReportedPlayheadPosition = 0;
 
 		if (!paused)
-			FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
-		FlxG.sound.music.onComplete = endSong;
-		vocals.play();
+		{
+			//FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
+
+			musicThing.speed = Conductor.playbackSpeed;
+			vocalThing.speed = Conductor.playbackSpeed;
+			musicThing.play();
+
+			if (FlxG.sound.music != null)
+				FlxG.sound.music.stop();
+			
+		}
+		
+		//DD: replicating the below in update()
+		//FlxG.sound.music.onComplete = endSong;
+		
+		vocalThing.play();
 
 		#if desktop
 		// Song duration in a float, useful for the time left feature
-		songLength = FlxG.sound.music.length;
+		songLength = musicThing.length;
 
 		// Updating Discord Rich Presence (with Time Left)
 		// DiscordClient.changePresence(detailsText, SONG.song + " (" + storyDifficultyText + ")", iconRPC, true, songLength);
@@ -1073,12 +1104,12 @@ class PlayState extends MusicBeatState
 
 		curSong = songData.song;
 
-		if (SONG.needsVoices)
+		/*if (SONG.needsVoices)
 			vocals = new FlxSound().loadEmbedded(Paths.voices(PlayState.SONG.song));
 		else
 			vocals = new FlxSound();
 
-		FlxG.sound.list.add(vocals);
+		FlxG.sound.list.add(vocals);*/
 
 		notes = new FlxTypedGroup<Note>();
 		add(notes);
@@ -1302,10 +1333,10 @@ class PlayState extends MusicBeatState
 	{
 		if (paused)
 		{
-			if (FlxG.sound.music != null)
+			if (musicThing != null)
 			{
-				FlxG.sound.music.pause();
-				vocals.pause();
+				musicThing.pause();
+				vocalThing.pause();
 				// stopSamples();
 			}
 
@@ -1320,7 +1351,7 @@ class PlayState extends MusicBeatState
 	{
 		if (paused)
 		{
-			if (FlxG.sound.music != null && !startingSong)
+			if (musicThing != null && !startingSong)
 			{
 				resyncVocals();
 			}
@@ -1383,13 +1414,14 @@ class PlayState extends MusicBeatState
 
 	function resyncVocals():Void
 	{
-		vocals.pause();
+		vocalThing.pause();
+		musicThing.pause();
 		stopSamples();
 
-		FlxG.sound.music.play();
-		Conductor.songPosition = FlxG.sound.music.time;
-		vocals.time = Conductor.songPosition;
-		vocals.play();
+		Conductor.songPosition = musicThing.time;
+		vocalThing.time = Conductor.songPosition;
+		musicThing.play();
+		vocalThing.play();
 	}
 
 	private var paused:Bool = false;
@@ -1404,6 +1436,19 @@ class PlayState extends MusicBeatState
 
 		// FlxG.watch.addQuick("Array:", sourcesinuse);
 		// FlxG.watch.addQuick("ArraySize:", sourcesinuse.length);
+
+		//DD: music's onComplete is replicated here because I'm too lazy to figure out how to
+		//implement it in the custom class
+		if (musicThing != null && (musicThing.time >= musicThing.length || musicThing.stopped))
+		{
+			endSong();
+		}
+
+		/*if (musicThing != null)
+		{
+			FlxG.watch.addQuick('C:', Conductor.songPosition);
+			FlxG.watch.addQuick('S:', musicThing.time);
+		}*/
 
 		if (FlxG.keys.justPressed.NINE)
 		{
@@ -1501,7 +1546,7 @@ class PlayState extends MusicBeatState
 		{
 			if (startedCountdown)
 			{
-				Conductor.songPosition += FlxG.elapsed * 1000;
+				Conductor.songPosition += FlxG.elapsed * 1000 * Conductor.playbackSpeed;
 				if (Conductor.songPosition >= 0)
 					startSong();
 			}
@@ -1509,7 +1554,7 @@ class PlayState extends MusicBeatState
 		else
 		{
 			// Conductor.songPosition = FlxG.sound.music.time;
-			Conductor.songPosition += FlxG.elapsed * 1000;
+			Conductor.songPosition += FlxG.elapsed * 1000 * Conductor.playbackSpeed;
 
 			if (!paused)
 			{
@@ -1554,7 +1599,7 @@ class PlayState extends MusicBeatState
 				}
 
 				if (dad.curCharacter == 'mom')
-					vocals.volume = 1;
+					vocalThing.volume = 1;
 
 				if (SONG.song.toLowerCase() == 'tutorial')
 				{
@@ -1620,7 +1665,7 @@ class PlayState extends MusicBeatState
 			switch (curBeat)
 			{
 				case 128, 129, 130:
-					vocals.volume = 0;
+					vocalThing.volume = 0;
 					// FlxG.sound.music.stop();
 					// FlxG.switchState(new PlayState());
 			}
@@ -1649,8 +1694,8 @@ class PlayState extends MusicBeatState
 			persistentDraw = false;
 			paused = true;
 
-			vocals.stop();
-			FlxG.sound.music.stop();
+			vocalThing.stop();
+			musicThing.stop();
 
 			openSubState(new GameOverSubstate(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
 
@@ -1733,7 +1778,7 @@ class PlayState extends MusicBeatState
 
 					if (SONG.needsVoices)
 					{
-						vocals.volume = 1;
+						vocalThing.volume = 1;
 					}
 					// DD: Play vocal samples for player2
 					handleVocalPlayback(daNote, dada, dadi, dadu, dade, dado);
@@ -1751,7 +1796,7 @@ class PlayState extends MusicBeatState
 					if (daNote.tooLate || !daNote.wasGoodHit)
 					{
 						health -= 0.0475;
-						vocals.volume = 0;
+						vocalThing.volume = 0;
 					}
 
 					daNote.active = false;
@@ -1783,8 +1828,8 @@ class PlayState extends MusicBeatState
 	function endSong():Void
 	{
 		canPause = false;
-		FlxG.sound.music.volume = 0;
-		vocals.volume = 0;
+		musicThing.volume = 0;
+		vocalThing.volume = 0;
 		if (SONG.validScore)
 		{
 			#if !switch
@@ -1848,7 +1893,7 @@ class PlayState extends MusicBeatState
 				prevCamFollow = camFollow;
 
 				PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0].toLowerCase() + difficulty, PlayState.storyPlaylist[0]);
-				FlxG.sound.music.stop();
+				musicThing.stop();
 
 				LoadingState.loadAndSwitchState(new PlayState());
 			}
@@ -1866,7 +1911,7 @@ class PlayState extends MusicBeatState
 	{
 		var noteDiff:Float = Math.abs(strumtime - Conductor.songPosition);
 		// boyfriend.playAnim('hey');
-		vocals.volume = 1;
+		vocalThing.volume = 1;
 
 		var placement:String = Std.string(combo);
 
@@ -2313,7 +2358,7 @@ class PlayState extends MusicBeatState
 			});
 
 			note.wasGoodHit = true;
-			vocals.volume = 1;
+			vocalThing.volume = 1;
 
 			// DD: Handle note and pitch for player1, similar to player2
 			handleVocalPlayback(note, bfa, bfi, bfu, bfe, bfo, bfholds);
@@ -2330,6 +2375,9 @@ class PlayState extends MusicBeatState
 	public static function handleVocalPlayback(note:Note, asource:SyllableSound, isource:SyllableSound, usource:SyllableSound, esource:SyllableSound,
 			osource:SyllableSound, holds:Map<Int, SyllableSound> = null)
 	{
+		if (!TitleState.arrowVocals)
+			return;
+
 		var playsnd:SyllableSound = asource;
 
 		switch (note.noteSyllable)
@@ -2360,7 +2408,10 @@ class PlayState extends MusicBeatState
 		}
 
 		// DD: The sole reason why I have to mess with OpenAL directly. Sound pitch adjustment.
-		playsnd.setPitch(note.notePitch);
+		var desiredPitch = note.notePitch;
+		if (!TitleState.pitchShift)
+			desiredPitch *= Conductor.playbackSpeed;
+		playsnd.setPitch(desiredPitch);
 
 		//DD: Set volume of note too
 		playsnd.setVolume(note.noteVolume);
@@ -2372,12 +2423,12 @@ class PlayState extends MusicBeatState
 				// playsnd.loopOn();
 				if (holds != null)
 					holds[note.holdID] = playsnd;
-				playsnd.play(note.sustainLength + Conductor.stepCrochet);
+				playsnd.play((note.sustainLength + Conductor.stepCrochet) * (1/Conductor.playbackSpeed));
 			}
 		}
 		else
 		{
-			playsnd.play(Conductor.stepCrochet);
+			playsnd.play(Conductor.stepCrochet * (1/Conductor.playbackSpeed));
 		}
 	}
 
@@ -2472,7 +2523,9 @@ class PlayState extends MusicBeatState
 	override function stepHit()
 	{
 		super.stepHit();
-		if (FlxG.sound.music.time > Conductor.songPosition + 20 || FlxG.sound.music.time < Conductor.songPosition - 20)
+		if (musicThing == null)
+			return;
+		if (musicThing.time > Conductor.songPosition + 20 || musicThing.time < Conductor.songPosition - 20)
 		{
 			resyncVocals();
 		}

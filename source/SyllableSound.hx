@@ -201,7 +201,7 @@ class SyllableSound
 	// DD: Reads an .ogg or something. It's not the most efficient, but this only runs at level start.
 	public static function readVorbisFileBuffer(vorbisFile:VorbisFile):UInt8Array
 	{
-		var length = Std.int(vorbisFile.bitrate() * vorbisFile.timeTotal() * 4);
+		var length = Std.int(vorbisFile.bitrate() * vorbisFile.timeTotal() * vorbisFile.info().rate/10000);
 		var buffer = Bytes.alloc(length);
 		var read = 0, total = 0, readMax;
 
