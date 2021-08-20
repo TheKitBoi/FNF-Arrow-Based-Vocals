@@ -66,9 +66,9 @@ class PlayState extends MusicBeatState
 
 	var allSyllableSounds:Array<SyllableSound>;
 
-	//DD: Using custom class for music/vocals for speed change
-	private var musicThing: AudioThing;
-	private var vocalThing: AudioThing;
+	// DD: Using custom class for music/vocals for speed change
+	private var musicThing:AudioThing;
+	private var vocalThing:AudioThing;
 
 	public static var curStage:String = '';
 	public static var SONG:SwagSong;
@@ -79,8 +79,7 @@ class PlayState extends MusicBeatState
 
 	var halloweenLevel:Bool = false;
 
-	//private var vocals:FlxSound;
-
+	// private var vocals:FlxSound;
 	private var dad:Character;
 	private var gf:Character;
 	private var boyfriend:Boyfriend;
@@ -191,7 +190,7 @@ class PlayState extends MusicBeatState
 
 		allSyllableSounds = [dada, dadi, dadu, dade, dado, bfa, bfi, bfu, bfe, bfo];
 
-		//DD: Using custom class for music/vocals here for speed changing.
+		// DD: Using custom class for music/vocals here for speed changing.
 		var musicString = "assets/songs/" + PlayState.SONG.song.toLowerCase() + "/Inst." + Paths.SOUND_EXT;
 		musicThing = new AudioThing(musicString);
 		add(musicThing);
@@ -965,7 +964,7 @@ class PlayState extends MusicBeatState
 
 		var swagCounter:Int = 0;
 
-		startTimer = new FlxTimer().start(Conductor.crochet / 1000 * (1/Conductor.playbackSpeed), function(tmr:FlxTimer)
+		startTimer = new FlxTimer().start(Conductor.crochet / 1000 * (1 / Conductor.playbackSpeed), function(tmr:FlxTimer)
 		{
 			dad.dance();
 			gf.dance();
@@ -1068,7 +1067,7 @@ class PlayState extends MusicBeatState
 
 		if (!paused)
 		{
-			//FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
+			// FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 
 			musicThing.speed = Conductor.playbackSpeed;
 			vocalThing.speed = Conductor.playbackSpeed;
@@ -1076,12 +1075,11 @@ class PlayState extends MusicBeatState
 
 			if (FlxG.sound.music != null)
 				FlxG.sound.music.stop();
-			
 		}
-		
-		//DD: replicating the below in update()
-		//FlxG.sound.music.onComplete = endSong;
-		
+
+		// DD: replicating the below in update()
+		// FlxG.sound.music.onComplete = endSong;
+
 		vocalThing.play();
 
 		#if desktop
@@ -1105,11 +1103,11 @@ class PlayState extends MusicBeatState
 		curSong = songData.song;
 
 		/*if (SONG.needsVoices)
-			vocals = new FlxSound().loadEmbedded(Paths.voices(PlayState.SONG.song));
-		else
-			vocals = new FlxSound();
+				vocals = new FlxSound().loadEmbedded(Paths.voices(PlayState.SONG.song));
+			else
+				vocals = new FlxSound();
 
-		FlxG.sound.list.add(vocals);*/
+			FlxG.sound.list.add(vocals); */
 
 		notes = new FlxTypedGroup<Note>();
 		add(notes);
@@ -1397,6 +1395,12 @@ class PlayState extends MusicBeatState
 		}
 		#end
 
+		if (!startingSong && !paused && !endingSong)
+		{
+			vocalThing.play();
+			musicThing.play();
+		}
+
 		super.onFocus();
 	}
 
@@ -1409,6 +1413,11 @@ class PlayState extends MusicBeatState
 		}
 		#end
 
+		for (i in allSyllableSounds)
+			i.stop();
+		vocalThing.pause();
+		musicThing.pause();
+
 		super.onFocusLost();
 	}
 
@@ -1416,7 +1425,7 @@ class PlayState extends MusicBeatState
 	{
 		vocalThing.pause();
 		musicThing.pause();
-		stopSamples();
+		// stopSamples();
 
 		Conductor.songPosition = musicThing.time;
 		vocalThing.time = Conductor.songPosition;
@@ -1437,17 +1446,17 @@ class PlayState extends MusicBeatState
 		// FlxG.watch.addQuick("Array:", sourcesinuse);
 		// FlxG.watch.addQuick("ArraySize:", sourcesinuse.length);
 
-		//DD: music's onComplete is replicated here because I'm too lazy to figure out how to
-		//implement it in the custom class
+		// DD: music's onComplete is replicated here because I'm too lazy to figure out how to
+		// implement it in the custom class
 		if (musicThing != null && (musicThing.time >= musicThing.length || musicThing.stopped))
 		{
 			endSong();
 		}
 
 		/*if (musicThing != null)
-		{
-			FlxG.watch.addQuick('C:', Conductor.songPosition);
-			FlxG.watch.addQuick('S:', musicThing.time);
+			{
+				FlxG.watch.addQuick('C:', Conductor.songPosition);
+				FlxG.watch.addQuick('S:', musicThing.time);
 		}*/
 
 		if (FlxG.keys.justPressed.NINE)
@@ -1599,7 +1608,10 @@ class PlayState extends MusicBeatState
 				}
 
 				if (dad.curCharacter == 'mom')
+				{
 					vocalThing.volume = 1;
+					unmuteBF();
+				}
 
 				if (SONG.song.toLowerCase() == 'tutorial')
 				{
@@ -1666,6 +1678,7 @@ class PlayState extends MusicBeatState
 			{
 				case 128, 129, 130:
 					vocalThing.volume = 0;
+					muteBF();
 					// FlxG.sound.music.stop();
 					// FlxG.switchState(new PlayState());
 			}
@@ -1779,13 +1792,12 @@ class PlayState extends MusicBeatState
 					if (SONG.needsVoices)
 					{
 						vocalThing.volume = 1;
+						unmuteBF();
 					}
-					// DD: Play vocal samples for player2
-					handleVocalPlayback(daNote, dada, dadi, dadu, dade, dado);
 
 					daNote.kill();
-					notes.remove(daNote, true);
-					daNote.destroy();
+					// notes.remove(daNote, true);
+					// daNote.destroy();
 				}
 
 				// WIP interpolation shit? Need to fix the pause issue
@@ -1797,14 +1809,32 @@ class PlayState extends MusicBeatState
 					{
 						health -= 0.0475;
 						vocalThing.volume = 0;
+						muteBF();
 					}
 
 					daNote.active = false;
 					daNote.visible = false;
 
 					daNote.kill();
-					notes.remove(daNote, true);
-					daNote.destroy();
+					// notes.remove(daNote, true);
+					// daNote.destroy();
+				}
+			});
+
+			notes.forEach(function(daNote:Note)
+			{
+				// DD: Play vocal samples for player2
+				if (!daNote.samplePlayed && !daNote.mustPress && daNote.strumTime - Conductor.songPosition <= 0)
+				{
+					handleVocalPlayback(daNote, dada, dadi, dadu, dade, dado);
+					daNote.samplePlayed = true;
+				}
+
+				// DD: Vocal playback for BF is timed vocals are turned off
+				if (!daNote.samplePlayed && daNote.mustPress && !TitleState.timedVocals && daNote.strumTime - Conductor.songPosition <= 0)
+				{
+					handleVocalPlayback(daNote, bfa, bfi, bfu, bfe, bfo);
+					daNote.samplePlayed = true;
 				}
 			});
 		}
@@ -1830,6 +1860,7 @@ class PlayState extends MusicBeatState
 		canPause = false;
 		musicThing.volume = 0;
 		vocalThing.volume = 0;
+		muteBF();
 		if (SONG.validScore)
 		{
 			#if !switch
@@ -1912,6 +1943,7 @@ class PlayState extends MusicBeatState
 		var noteDiff:Float = Math.abs(strumtime - Conductor.songPosition);
 		// boyfriend.playAnim('hey');
 		vocalThing.volume = 1;
+		unmuteBF();
 
 		var placement:String = Std.string(combo);
 
@@ -2171,7 +2203,7 @@ class PlayState extends MusicBeatState
 			{
 				notes.forEachAlive(function(daNote:Note)
 				{
-					if (daNote.canBeHit && daNote.mustPress && daNote.isSustainNote)
+					if (TitleState.timedVocals && daNote.canBeHit && daNote.mustPress && daNote.isSustainNote)
 					{
 						switch (daNote.noteData)
 						{
@@ -2359,15 +2391,17 @@ class PlayState extends MusicBeatState
 
 			note.wasGoodHit = true;
 			vocalThing.volume = 1;
+			unmuteBF();
 
 			// DD: Handle note and pitch for player1, similar to player2
-			handleVocalPlayback(note, bfa, bfi, bfu, bfe, bfo, bfholds);
+			if (TitleState.timedVocals)
+				handleVocalPlayback(note, bfa, bfi, bfu, bfe, bfo, bfholds);
 
 			if (!note.isSustainNote)
 			{
 				note.kill();
-				notes.remove(note, true);
-				note.destroy();
+				// notes.remove(note, true);
+				// note.destroy();
 			}
 		}
 	}
@@ -2409,11 +2443,9 @@ class PlayState extends MusicBeatState
 
 		// DD: The sole reason why I have to mess with OpenAL directly. Sound pitch adjustment.
 		var desiredPitch = note.notePitch;
-		if (!TitleState.pitchShift)
-			desiredPitch *= Conductor.playbackSpeed;
 		playsnd.setPitch(desiredPitch);
 
-		//DD: Set volume of note too
+		// DD: Set volume of note too
 		playsnd.setVolume(note.noteVolume);
 
 		if (note.sustainLength > 0)
@@ -2423,12 +2455,12 @@ class PlayState extends MusicBeatState
 				// playsnd.loopOn();
 				if (holds != null)
 					holds[note.holdID] = playsnd;
-				playsnd.play((note.sustainLength + Conductor.stepCrochet) * (1/Conductor.playbackSpeed));
+				playsnd.play((note.sustainLength + Conductor.stepCrochet) * (1 / Conductor.playbackSpeed));
 			}
 		}
 		else
 		{
-			playsnd.play(Conductor.stepCrochet * (1/Conductor.playbackSpeed));
+			playsnd.play(Conductor.stepCrochet * (1 / Conductor.playbackSpeed));
 		}
 	}
 
@@ -2653,16 +2685,6 @@ class PlayState extends MusicBeatState
 		}
 	}
 
-	override function switchTo(nextState:FlxState):Bool
-	{
-		//stopSamples();
-		for (i in allSyllableSounds)
-		{
-			i.delete();
-		}
-		return super.switchTo(nextState);
-	}
-
 	// DD: Self-explanatory
 	function stopSamples()
 	{
@@ -2671,6 +2693,34 @@ class PlayState extends MusicBeatState
 			i.stop();
 			// i.loopOff();
 		}
+	}
+
+	function muteBF()
+	{
+		if (!TitleState.timedVocals)
+		{
+			for (i in [bfa, bfi, bfu, bfe, bfo])
+				i.mute();
+		}
+	}
+
+	function unmuteBF()
+	{
+		if (!TitleState.timedVocals)
+		{
+			for (i in [bfa, bfi, bfu, bfe, bfo])
+				i.unmute();
+		}
+	}
+
+	override public function destroy()
+	{
+		for (i in 0...allSyllableSounds.length)
+		{
+			allSyllableSounds[i].delete();
+		}
+		allSyllableSounds = null;
+		super.destroy();
 	}
 
 	var curLight:Int = 0;

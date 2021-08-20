@@ -125,7 +125,6 @@ class ChartingState extends MusicBeatState
 
 	override function create()
 	{
-
 		Conductor.playbackSpeed = 1.0;
 
 		curSection = lastSection;
@@ -1037,7 +1036,7 @@ class ChartingState extends MusicBeatState
 				curSelectedSyllable = -1;
 			}
 
-			//DD: Volume adjustment keys
+			// DD: Volume adjustment keys
 			if (FlxG.keys.justPressed.SEMICOLON)
 			{
 				if (curSelectedVolume - 0.1 >= 0.0)
@@ -1315,6 +1314,12 @@ class ChartingState extends MusicBeatState
 
 	function updateNoteUI():Void
 	{
+		for (i in pitchButtons)
+			i.setLabelFormat(null, 12, FlxColor.WHITE);
+		for (i in syllableButtons)
+			i.setLabelFormat(null, 12, FlxColor.WHITE);
+		stepperNoteOctave.visible = false;
+
 		if (curSelectedNote != null)
 		{
 			stepperSusLength.value = curSelectedNote[2];
@@ -1332,12 +1337,6 @@ class ChartingState extends MusicBeatState
 				stepperNoteOctave.visible = true;
 				stepperNoteOctave.value = Math.floor(xvalue / 12);
 			}
-			else
-			{
-				for (i in pitchButtons)
-					i.setLabelFormat(null, 12, FlxColor.WHITE);
-				stepperNoteOctave.visible = false;
-			}
 			// DD: UI for syllable buttons
 			if (curSelectedNote[4] != null)
 			{
@@ -1348,11 +1347,6 @@ class ChartingState extends MusicBeatState
 					else
 						syllableButtons[i + 1].setLabelFormat(null, 12, FlxColor.BLACK);
 				}
-			}
-			else
-			{
-				for (i in syllableButtons)
-					i.setLabelFormat(null, 12, FlxColor.WHITE);
 			}
 			// DD: UI for note volume
 			stepperNoteVolume.value = curSelectedNote[5];
@@ -1525,13 +1519,27 @@ class ChartingState extends MusicBeatState
 		var noteData = Math.floor(FlxG.mouse.x / GRID_SIZE);
 		var noteSus = 0;
 		// DD: Added note pitch stuff here too
-		_song.notes[curSection].sectionNotes.push([noteStrum, noteData, noteSus, curSelectedPitch, curSelectedSyllable, curSelectedVolume]);
+		_song.notes[curSection].sectionNotes.push([
+			noteStrum,
+			noteData,
+			noteSus,
+			curSelectedPitch,
+			curSelectedSyllable,
+			curSelectedVolume
+		]);
 
 		curSelectedNote = _song.notes[curSection].sectionNotes[_song.notes[curSection].sectionNotes.length - 1];
 
 		if (FlxG.keys.pressed.CONTROL)
 		{
-			_song.notes[curSection].sectionNotes.push([noteStrum, (noteData + 4) % 8, noteSus, curSelectedPitch, curSelectedSyllable, curSelectedVolume]);
+			_song.notes[curSection].sectionNotes.push([
+				noteStrum,
+				(noteData + 4) % 8,
+				noteSus,
+				curSelectedPitch,
+				curSelectedSyllable,
+				curSelectedVolume
+			]);
 		}
 
 		trace(noteStrum);
@@ -1665,16 +1673,6 @@ class ChartingState extends MusicBeatState
 		FlxG.log.error("Problem saving Level data");
 	}
 
-	override function switchTo(nextState:FlxState):Bool
-	{
-		// stopSamples();
-		for (i in allSyllableSounds)
-		{
-			i.delete();
-		}
-		return super.switchTo(nextState);
-	}
-
 	// DD: Self-explanatory
 	function stopSamples()
 	{
@@ -1683,5 +1681,15 @@ class ChartingState extends MusicBeatState
 			i.stop();
 			// i.loopOff();
 		}
+	}
+
+	override public function destroy()
+	{
+		for (i in 0...allSyllableSounds.length)
+		{
+			allSyllableSounds[i].delete();
+		}
+		allSyllableSounds = null;
+		super.destroy();
 	}
 }

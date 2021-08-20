@@ -1,5 +1,7 @@
 package;
 
+import flixel.util.FlxDestroyUtil;
+import flixel.util.FlxTimer;
 import lime.media.vorbis.VorbisInfo;
 import lime.utils.ArrayBuffer;
 import flixel.FlxG;
@@ -18,13 +20,18 @@ class SyllableSound
 	// Otherwise, the source's sound gets cut off without fading out and causes an audible crackle.
 	var sources:Array<ALSource> = [AL.createSource(), AL.createSource(), AL.createSource()];
 	var volume:Float = 1.0;
+	var pitch:Float = 1.0;
 	var inUse:Array<Bool> = [false, false, false];
 	var fadingNow:Array<Bool> = [false, false, false];
 	var currentSource:Int = 0;
 	var isPaused:Bool = false;
 	var ttl:Float = 0;
+	var muted:Bool = false;
+	var loop:Bool = true;
 
-	public function new(playerName:String, syllable:String, loop:Bool = true)
+	public var sndLength:Float;
+
+	public function new(playerName:String, syllable:String, _loop:Bool = true)
 	{
 		var vorb:VorbisFile;
 		if (FileSystem.exists("assets/shared/sounds/voices/" + playerName + "/" + syllable + ".ogg"))
@@ -42,6 +49,8 @@ class SyllableSound
 		if (vorbInfo.channels <= 1)
 			vorbChannels = AL.FORMAT_MONO16;
 		var vorbRate = vorbInfo.rate;
+		sndLength = vorb.timeTotal() * 1000;
+		loop = _loop;
 
 		AL.bufferData(buffer, vorbChannels, sndData, sndData.length, vorbRate);
 		for (i in sources)
@@ -50,6 +59,7 @@ class SyllableSound
 		}
 		if (loop)
 			loopOn();
+		// loopOn();
 	}
 
 	public function play(length:Float = 0)
@@ -57,35 +67,23 @@ class SyllableSound
 		if (inUse[currentSource] || fadingNow[currentSource])
 			currentSource = (currentSource + 1) % sources.length;
 
-		AL.sourcei(sources[currentSource], AL.GAIN, Conductor.masterVolume * volume * FlxG.sound.volume);
+		AL.sourcef(sources[currentSource], AL.GAIN, Conductor.masterVolume * volume * FlxG.sound.volume);
 		AL.sourcePlay(sources[currentSource]);
 		inUse[currentSource] = true;
 		fadingNow[currentSource] = false;
 		setTime(length);
-
-		// DD: OpenAL got some jank that causes sounds to stop suddenly.
-		sys.thread.Thread.create(() ->
-		{
-			var thisSource = currentSource;
-			while (inUse[thisSource])
-			{
-				if (AL.getSourcei(sources[currentSource], AL.SOURCE_STATE) == AL.STOPPED)
-				{
-					AL.sourcePlay(sources[currentSource]);
-				}
-			}
-		});
 	}
 
 	public function update(elasped:Float, gamePaused:Bool)
 	{
 		refreshVolume();
+		refreshPitch();
 		if (gamePaused)
 			stop();
-		else
+		else if (loop)
 			decreaseTime(elasped);
 
-		if (ttl <= 0)
+		if (loop && ttl <= 0)
 		{
 			stop();
 		}
@@ -107,7 +105,7 @@ class SyllableSound
 	{
 		if (inUse[currentSource])
 		{
-			AL.sourcei(sources[currentSource], AL.GAIN, 0);
+			AL.sourcef(sources[currentSource], AL.GAIN, 0);
 			inUse[currentSource] = false;
 			ttl = 0;
 			fadingNow[currentSource] = true;
@@ -126,9 +124,12 @@ class SyllableSound
 	// DD: Don't call this unless the syllablesound is about to discarded.
 	public function forceStop()
 	{
-		inUse[currentSource] = false;
-		fadingNow[currentSource] = false;
-		AL.sourceStop(sources[currentSource]);
+		for (i in 0...sources.length)
+		{
+			inUse[i] = false;
+			fadingNow[i] = false;
+			AL.sourceStop(sources[i]);
+		}
 	}
 
 	public function setVolume(vol:Float)
@@ -140,11 +141,33 @@ class SyllableSound
 	{
 		for (i in 0...sources.length)
 		{
-			if (FlxG.sound.muted)
+			if (FlxG.sound.muted || muted)
 				AL.sourcef(sources[i], AL.GAIN, 0);
 			else if (inUse[i])
 				AL.sourcef(sources[i], AL.GAIN, Conductor.masterVolume * volume * FlxG.sound.volume);
 		}
+	}
+
+	public function refreshPitch()
+	{
+		for (i in 0...sources.length)
+		{
+			var newpitch = pitch;
+			if (!TitleState.pitchShift)
+				newpitch *= Conductor.playbackSpeed;
+			if (inUse[i])
+				AL.sourcef(sources[i], AL.PITCH, newpitch);
+		}
+	}
+
+	public function mute()
+	{
+		muted = true;
+	}
+
+	public function unmute()
+	{
+		muted = false;
 	}
 
 	public function loopOn()
@@ -153,16 +176,23 @@ class SyllableSound
 			AL.sourcei(source, AL.LOOPING, 1);
 	}
 
-	public function loopOff()
-	{
-		for (source in sources)
-			AL.sourcei(source, AL.LOOPING, 0);
-	}
+	// public function loopOff()
+	// {
+	// 	for (source in sources)
+	// 		AL.sourcei(source, AL.LOOPING, 0);
+	// }
 
-	public function setPitch(pitch:Float)
+	public function setPitch(_pitch:Float)
 	{
-		for (source in sources)
-			AL.sourcef(source, AL.PITCH, pitch);
+		pitch = _pitch;
+		var newPitch = _pitch;
+		if (!TitleState.pitchShift)
+			newPitch *= Conductor.playbackSpeed;
+
+		for (i in 0...sources.length)
+		{
+			AL.sourcef(sources[i], AL.PITCH, newPitch);
+		}
 	}
 
 	public function pause()
@@ -177,12 +207,15 @@ class SyllableSound
 			AL.sourcePlay(sources[currentSource]);
 	}
 
-	// DD: Delete this thing. May cause memory leaks. Needs more testing.
+	// DD: Delet this
 	public function delete()
 	{
 		forceStop();
+		for (source in sources)
+			AL.sourcei(source, AL.BUFFER, null);
 		AL.deleteSources(sources);
 		AL.deleteBuffer(buffer);
+		sources = null;
 	}
 
 	// DD: Anything outside doesn't need to know we have multiple sources and inUse values.
@@ -201,7 +234,13 @@ class SyllableSound
 	// DD: Reads an .ogg or something. It's not the most efficient, but this only runs at level start.
 	public static function readVorbisFileBuffer(vorbisFile:VorbisFile):UInt8Array
 	{
-		var length = Std.int(vorbisFile.bitrate() * vorbisFile.timeTotal() * vorbisFile.info().rate/10000);
+		var vorbInfo:VorbisInfo = vorbisFile.info();
+		var vorbChannels = AL.FORMAT_STEREO16;
+		if (vorbInfo.channels <= 1)
+			vorbChannels = AL.FORMAT_MONO16;
+		var vorbRate = vorbInfo.rate;
+
+		var length = Std.int(vorbRate * vorbInfo.channels * 16 * vorbisFile.timeTotal() / 8);
 		var buffer = Bytes.alloc(length);
 		var read = 0, total = 0, readMax;
 

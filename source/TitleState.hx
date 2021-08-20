@@ -45,6 +45,7 @@ class TitleState extends MusicBeatState
 	var wackyImage:FlxSprite;
 
 	static public var arrowVocals:Bool = true;
+	static public var timedVocals:Bool = true;
 	static public var pitchShift:Bool = false;
 
 	override public function create():Void
@@ -109,6 +110,8 @@ class TitleState extends MusicBeatState
 			pitchShift = FlxG.save.data.pitchShift;
 		if (FlxG.save.data.arrowVocals != null)
 			arrowVocals = FlxG.save.data.arrowVocals;
+		if (FlxG.save.data.timedVocals != null)
+			timedVocals = FlxG.save.data.timedVocals;
 	}
 
 	var logoBl:FlxSprite;

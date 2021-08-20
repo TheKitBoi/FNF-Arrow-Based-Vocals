@@ -36,6 +36,7 @@ class MainMenuState extends MusicBeatState
 	var camFollow:FlxObject;
 
 	var checkArrowVocals:FlxText;
+	var checkTimedVocals:FlxText;
 	var checkPitchShift:FlxText;
 
 	override function create()
@@ -109,10 +110,15 @@ class MainMenuState extends MusicBeatState
 
 		changeItem();
 
-		checkArrowVocals = new FlxText(5, FlxG.height - 80, 0, "", 12);
+		checkArrowVocals = new FlxText(5, FlxG.height - 110, 0, "", 12);
 		checkArrowVocals.scrollFactor.set();
 		checkArrowVocals.setFormat("VCR OSD Mono", 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(checkArrowVocals);
+
+		checkTimedVocals = new FlxText(5, FlxG.height - 80, 0, "", 12);
+		checkTimedVocals.scrollFactor.set();
+		checkTimedVocals.setFormat("VCR OSD Mono", 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		add(checkTimedVocals);
 
 		checkPitchShift = new FlxText(5, FlxG.height - 50, 0, "", 12);
 		checkPitchShift.scrollFactor.set();
@@ -128,8 +134,10 @@ class MainMenuState extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
-		checkArrowVocals.text = "Arrow-Based Vocals (Press O to toggle): " + TitleState.arrowVocals;
-		
+		checkArrowVocals.text = "Arrow-Based Vocals (Press I to toggle): " + TitleState.arrowVocals;
+
+		checkTimedVocals.text = "Vocals Timed to Key Press (Press O to toggle): " + TitleState.timedVocals;
+
 		checkPitchShift.text = "Speed Changes Don't Affect Pitch (Press P to toggle): ";
 		if (TitleState.pitchShift)
 			checkPitchShift.text += "true (Warning: doesn't sound good)";
@@ -143,7 +151,7 @@ class MainMenuState extends MusicBeatState
 
 		if (!selectedSomethin)
 		{
-			if (FlxG.keys.justPressed.O)
+			if (FlxG.keys.justPressed.I)
 			{
 				FlxG.sound.play(Paths.sound('scrollMenu'));
 				if (TitleState.arrowVocals)
@@ -151,6 +159,16 @@ class MainMenuState extends MusicBeatState
 				else
 					TitleState.arrowVocals = true;
 				FlxG.save.data.arrowVocals = TitleState.arrowVocals;
+				FlxG.save.flush();
+			}
+			if (FlxG.keys.justPressed.O)
+			{
+				FlxG.sound.play(Paths.sound('scrollMenu'));
+				if (TitleState.timedVocals)
+					TitleState.timedVocals = false;
+				else
+					TitleState.timedVocals = true;
+				FlxG.save.data.timedVocals = TitleState.timedVocals;
 				FlxG.save.flush();
 			}
 			if (FlxG.keys.justPressed.P)
