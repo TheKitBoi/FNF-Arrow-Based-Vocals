@@ -1,7 +1,7 @@
 package;
 
 #if desktop
-import Discord.DiscordClient;
+//import Discord.DiscordClient;
 import sys.thread.Thread;
 #end
 import flixel.FlxG;
@@ -24,7 +24,7 @@ import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
-import io.newgrounds.NG;
+//import io.newgrounds.NG;
 import lime.app.Application;
 import openfl.Assets;
 
@@ -44,6 +44,10 @@ class TitleState extends MusicBeatState
 
 	var wackyImage:FlxSprite;
 
+	static public var arrowVocals:Bool = true;
+	static public var timedVocals:Bool = true;
+	static public var pitchShift:Bool = false;
+
 	override public function create():Void
 	{
 		#if polymod
@@ -58,14 +62,14 @@ class TitleState extends MusicBeatState
 
 		super.create();
 
-		NGio.noLogin(APIStuff.API);
+		//NGio.noLogin(APIStuff.API);
 
 		#if ng
-		var ng:NGio = new NGio(APIStuff.API, APIStuff.EncKey);
-		trace('NEWGROUNDS LOL');
+		//var ng:NGio = new NGio(APIStuff.API, APIStuff.EncKey);
+		//trace('NEWGROUNDS LOL');
 		#end
 
-		FlxG.save.bind('funkin', 'ninjamuffin99');
+		FlxG.save.bind('funkinarrowvocals');
 
 		Highscore.load();
 
@@ -95,12 +99,19 @@ class TitleState extends MusicBeatState
 		#end
 
 		#if desktop
-		DiscordClient.initialize();
+		/*DiscordClient.initialize();
 		
 		Application.current.onExit.add (function (exitCode) {
 			DiscordClient.shutdown();
-		 });
+		 });*/
 		#end
+
+		if (FlxG.save.data.pitchShift != null)
+			pitchShift = FlxG.save.data.pitchShift;
+		if (FlxG.save.data.arrowVocals != null)
+			arrowVocals = FlxG.save.data.arrowVocals;
+		if (FlxG.save.data.timedVocals != null)
+			timedVocals = FlxG.save.data.timedVocals;
 	}
 
 	var logoBl:FlxSprite;
@@ -136,6 +147,9 @@ class TitleState extends MusicBeatState
 
 			FlxG.sound.music.fadeIn(4, 0, 0.7);
 		}
+
+		//DD: Raise fps, I guess.
+		//openfl.Lib.current.stage.frameRate = 120;
 
 		Conductor.changeBPM(102);
 		persistentUpdate = true;
@@ -271,11 +285,11 @@ class TitleState extends MusicBeatState
 		if (pressedEnter && !transitioning && skippedIntro)
 		{
 			#if !switch
-			NGio.unlockMedal(60960);
+			//NGio.unlockMedal(60960);
 
 			// If it's Friday according to da clock
-			if (Date.now().getDay() == 5)
-				NGio.unlockMedal(61034);
+			/*if (Date.now().getDay() == 5)
+				NGio.unlockMedal(61034);*/
 			#end
 
 			titleText.animation.play('press');
@@ -290,21 +304,22 @@ class TitleState extends MusicBeatState
 			{
 				// Check if version is outdated
 
-				var version:String = "v" + Application.current.meta.get('version');
+				// var version:String = "v" + Application.current.meta.get('version');
 
-				if (version.trim() != NGio.GAME_VER_NUMS.trim() && !OutdatedSubState.leftState)
-				{
-					FlxG.switchState(new OutdatedSubState());
-					trace('OLD VERSION!');
-					trace('old ver');
-					trace(version.trim());
-					trace('cur ver');
-					trace(NGio.GAME_VER_NUMS.trim());
-				}
-				else
-				{
-					FlxG.switchState(new MainMenuState());
-				}
+				// if (version.trim() != NGio.GAME_VER_NUMS.trim() && !OutdatedSubState.leftState)
+				// {
+				// 	FlxG.switchState(new OutdatedSubState());
+				// 	trace('OLD VERSION!');
+				// 	trace('old ver');
+				// 	trace(version.trim());
+				// 	trace('cur ver');
+				// 	trace(NGio.GAME_VER_NUMS.trim());
+				// }
+				// else
+				// {
+				// 	FlxG.switchState(new MainMenuState());
+				// }
+				FlxG.switchState(new MainMenuState());
 			});
 			// FlxG.sound.play(Paths.music('titleShoot'), 0.7);
 		}
@@ -426,4 +441,5 @@ class TitleState extends MusicBeatState
 			skippedIntro = true;
 		}
 	}
+
 }

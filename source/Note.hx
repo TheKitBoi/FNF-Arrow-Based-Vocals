@@ -14,6 +14,12 @@ class Note extends FlxSprite
 {
 	public var strumTime:Float = 0;
 
+	// DD: Note pitch and other stuff
+	public var notePitch:Float = 1.0;
+	public var noteSyllable:Int = -1;
+	public var holdID:Int = 0;
+	public var noteVolume:Float = 1.0;
+
 	public var mustPress:Bool = false;
 	public var noteData:Int = 0;
 	public var canBeHit:Bool = false;
@@ -23,6 +29,7 @@ class Note extends FlxSprite
 
 	public var sustainLength:Float = 0;
 	public var isSustainNote:Bool = false;
+	public var samplePlayed = false;
 
 	public var noteScore:Float = 1;
 
@@ -175,7 +182,7 @@ class Note extends FlxSprite
 		{
 			// The * 0.5 is so that it's easier to hit them too late, instead of too early
 			if (strumTime > Conductor.songPosition - Conductor.safeZoneOffset
-				&& strumTime < Conductor.songPosition + (Conductor.safeZoneOffset * 0.5))
+				&& strumTime < Conductor.songPosition + Conductor.safeZoneOffset)
 				canBeHit = true;
 			else
 				canBeHit = false;

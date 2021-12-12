@@ -1,7 +1,7 @@
 package;
 
 #if desktop
-import Discord.DiscordClient;
+// import Discord.DiscordClient;
 #end
 import flixel.FlxG;
 import flixel.FlxObject;
@@ -14,7 +14,7 @@ import flixel.text.FlxText;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
-import io.newgrounds.NG;
+// import io.newgrounds.NG;
 import lime.app.Application;
 
 using StringTools;
@@ -26,19 +26,24 @@ class MainMenuState extends MusicBeatState
 	var menuItems:FlxTypedGroup<FlxSprite>;
 
 	#if !switch
-	var optionShit:Array<String> = ['story mode', 'freeplay', 'donate', 'options'];
+	// var optionShit:Array<String> = ['story mode', 'freeplay', 'donate', 'options'];
+	var optionShit:Array<String> = ['freeplay', 'donate'];
 	#else
-	var optionShit:Array<String> = ['story mode', 'freeplay'];
+	var optionShit:Array<String> = ['freeplay'];
 	#end
 
 	var magenta:FlxSprite;
 	var camFollow:FlxObject;
 
+	var checkArrowVocals:FlxText;
+	var checkTimedVocals:FlxText;
+	var checkPitchShift:FlxText;
+
 	override function create()
 	{
 		#if desktop
 		// Updating Discord Rich Presence
-		DiscordClient.changePresence("In the Menus", null);
+		// DiscordClient.changePresence("In the Menus", null);
 		#end
 
 		transIn = FlxTransitionableState.defaultTransIn;
@@ -105,6 +110,23 @@ class MainMenuState extends MusicBeatState
 
 		changeItem();
 
+		checkArrowVocals = new FlxText(5, FlxG.height - 110, 0, "", 12);
+		checkArrowVocals.scrollFactor.set();
+		checkArrowVocals.setFormat("VCR OSD Mono", 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		add(checkArrowVocals);
+
+		checkTimedVocals = new FlxText(5, FlxG.height - 80, 0, "", 12);
+		checkTimedVocals.scrollFactor.set();
+		checkTimedVocals.setFormat("VCR OSD Mono", 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		add(checkTimedVocals);
+
+		checkPitchShift = new FlxText(5, FlxG.height - 50, 0, "", 12);
+		checkPitchShift.scrollFactor.set();
+		checkPitchShift.setFormat("VCR OSD Mono", 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		#if (desktop && !hl)
+		add(checkPitchShift);
+		#end
+
 		super.create();
 	}
 
@@ -112,6 +134,16 @@ class MainMenuState extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
+		checkArrowVocals.text = "Arrow-Based Vocals (Press I to toggle): " + TitleState.arrowVocals;
+
+		checkTimedVocals.text = "Vocals Timed to Key Press (Press O to toggle): " + TitleState.timedVocals;
+
+		checkPitchShift.text = "Speed Changes Don't Affect Pitch (Press P to toggle): ";
+		if (TitleState.pitchShift)
+			checkPitchShift.text += "true (Warning: doesn't sound good)";
+		else
+			checkPitchShift.text += "false";
+
 		if (FlxG.sound.music.volume < 0.8)
 		{
 			FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
@@ -119,6 +151,36 @@ class MainMenuState extends MusicBeatState
 
 		if (!selectedSomethin)
 		{
+			if (FlxG.keys.justPressed.I)
+			{
+				FlxG.sound.play(Paths.sound('scrollMenu'));
+				if (TitleState.arrowVocals)
+					TitleState.arrowVocals = false;
+				else
+					TitleState.arrowVocals = true;
+				FlxG.save.data.arrowVocals = TitleState.arrowVocals;
+				FlxG.save.flush();
+			}
+			if (FlxG.keys.justPressed.O)
+			{
+				FlxG.sound.play(Paths.sound('scrollMenu'));
+				if (TitleState.timedVocals)
+					TitleState.timedVocals = false;
+				else
+					TitleState.timedVocals = true;
+				FlxG.save.data.timedVocals = TitleState.timedVocals;
+				FlxG.save.flush();
+			}
+			if (FlxG.keys.justPressed.P)
+			{
+				FlxG.sound.play(Paths.sound('scrollMenu'));
+				if (TitleState.pitchShift)
+					TitleState.pitchShift = false;
+				else
+					TitleState.pitchShift = true;
+				FlxG.save.data.pitchShift = TitleState.pitchShift;
+				FlxG.save.flush();
+			}
 			if (controls.UP_P)
 			{
 				FlxG.sound.play(Paths.sound('scrollMenu'));
